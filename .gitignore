@@ -5,3 +5,7 @@
 *.ear
 /bin
 *.db
+
+.project
+.classpath
+
