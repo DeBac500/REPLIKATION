@@ -4,5 +4,4 @@
 *.war
 *.ear
 /bin
-*.pdf
 *.db
