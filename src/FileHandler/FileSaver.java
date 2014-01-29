@@ -1,25 +1,20 @@
 package FileHandler;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.io.Serializable;
 
-import javax.jws.WebParam.Mode;
 
-public class Filesaver implements Serializable{
+public class FileSaver implements Serializable{
 	private String name;
 	private byte[] bytes;
 	
-	public Filesaver(String name) {
+	public FileSaver(String name) {
 		this.name = name;
 	}
+	
 	public void read()throws IOException{
 		File f = new File("Rechnungen/"+name);
 		if(f.isFile()){
@@ -29,8 +24,9 @@ public class Filesaver implements Serializable{
 			fis.close();
 		}
 	}
+	
 	public void write() throws IOException{
-		File f = new File("Rechnungen/testneu.pdf");
+		File f = new File("6*/testneu.pdf");
 		if(!f.exists()){
 			f.createNewFile();
 			FileOutputStream fos = new FileOutputStream(f);
@@ -40,7 +36,7 @@ public class Filesaver implements Serializable{
 	}
 	
 	public static void main(String[] args){
-		Filesaver fs = new Filesaver("test.pdf");
+		FileSaver fs = new FileSaver("test.pdf");
 		try {
 			fs.read();
 			System.out.println("Read Fertig!");
@@ -53,4 +49,5 @@ public class Filesaver implements Serializable{
 			e.printStackTrace();
 		}
 	}
+	
 }

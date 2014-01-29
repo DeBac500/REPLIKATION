@@ -6,16 +6,24 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import Controller.Controller;
+
 public class TCPVerbindung implements Runnable{
 	private Socket socket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 	private Thread thread;
 	private boolean run;
+	private Controller c;
 	
-	
-	public TCPVerbindung(String host, int port) throws UnknownHostException, IOException{
+	public TCPVerbindung(Controller c, String host, int port) throws UnknownHostException, IOException{
+		this.c = c;
 		this.socket = new Socket(host, port);
+		thread = new Thread(this);
+	}
+	public TCPVerbindung(Controller c,Socket socket){
+		this.c = c;
+		this.socket = socket;
 		thread = new Thread(this);
 	}
 	
