@@ -3,6 +3,8 @@ package Controller;
 import java.io.IOException;
 import java.util.Scanner;
 
+import FileHandler.FileSyncer;
+
 public class UserInterface implements Runnable{
 	private Controller controller;
 	private Scanner in;
@@ -32,7 +34,8 @@ public class UserInterface implements Runnable{
 	public void handleCInput(String in){
 		if(in.equalsIgnoreCase("sync")){
 			try {
-				this.controller.send(this.controller.setUpFileSync());
+				FileSyncer s = this.controller.setUpFileSync();
+				this.controller.send(s);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

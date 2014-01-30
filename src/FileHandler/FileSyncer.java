@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import Controller.Controller;
 import Controller.MyFilter;
@@ -42,6 +43,7 @@ public class FileSyncer implements Syncable{
 						FileSaver s = new FileSaver(temp.getName());
 						s.read();
 						files.put(temp.getName(), s);
+						System.out.println("Laden.. " + temp.getName());
 					}
 				}catch(Nothingtosync e){}
 			}
@@ -100,7 +102,8 @@ public class FileSyncer implements Syncable{
 		Iterator it = files.entrySet().iterator();
 	    while (it.hasNext()) {
 	    	try{
-		        FileSaver s = (FileSaver) it.next();
+	    		Map.Entry pairs = (Map.Entry)it.next();
+		        FileSaver s = (FileSaver) pairs.getValue();
 		        new File(path + "/" + s.getName()).delete();
 		        s.write(path);
 	    	}catch(IOException e){e.printStackTrace();}
@@ -117,7 +120,7 @@ public class FileSyncer implements Syncable{
 	public void copyFile(File from, String path) throws IOException{
 		FileInputStream in  = new FileInputStream(from);
 		File to = new File(path + "/CONFLICTED");
-		if(to.exists())
+		if(!to.exists())
 			to.mkdirs();
 		else{
 			to = new File(path + "/CONFLICTED/" + from.getName());

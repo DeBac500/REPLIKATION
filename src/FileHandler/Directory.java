@@ -33,7 +33,7 @@ public class Directory {
 		Long l = file.get(name);
 		if( l == null)
 			throw new Nothingtosync();
-		if(l <= last)
+		if(l < last)
 			newer = false;
 		return newer;
 	}

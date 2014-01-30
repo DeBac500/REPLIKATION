@@ -6,8 +6,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import Conection.TCPClientRegistration;
 import Conection.TCPVerbindung;
@@ -26,7 +27,7 @@ public class Controller {
 	private Directory dir;
 	
 	public Controller(String dburl, String dbusr, String dbpwd, String server, int port,String rechp) throws UnknownHostException, IOException, Nothingtosync{
-		log = Logger.getLogger("REPLIKATION");
+		log = Logger.getLogger("REPLI");
 		log.setLevel(Level.INFO);
 		log.info("Starting Client...");
 		client = true;
@@ -35,9 +36,13 @@ public class Controller {
 		this.dbpwd = dbpwd;
 		conect = new ArrayList<TCPVerbindung>();
 		conect.add(new TCPVerbindung(this,server, port));
+		conect.get(0).openConection();
 		this.rechp = rechp;
+		this.checkPath();
 		this.dir = new Directory(rechp);
 		dir.setUp();
+		ui = new UserInterface(this);
+		ui.start();
 		log.info("Client started");
 	}
 	public Controller(String dburl, String dbusr, String dbpwd, int port,String rechp){
@@ -52,7 +57,10 @@ public class Controller {
 		tcpreg = new TCPClientRegistration(this, port);
 		tot = new Totengraeber();
 		this.rechp = rechp;
+		this.checkPath();
 		dir=null;
+		ui = new UserInterface(this);
+		ui.start();
 		log.info("Server started!");
 	}
 	public void checkPath(){
@@ -60,7 +68,7 @@ public class Controller {
 		if(p.exists()){
 			if(!p.isDirectory())
 				if(p.isFile()){
-					log.error("Path is a File!!\n Stopping Programm!");
+					log.severe("Path is a File!!\n Stopping Programm!");
 					this.shutdown();
 				}
 		}else{
@@ -73,9 +81,6 @@ public class Controller {
 		log.info("New Client conected: " + socket.getInetAddress().getHostAddress());
 		conect.add(new TCPVerbindung(this, socket));
 		conect.get(conect.size()-1).openConection();
-		try{
-		conect.get(conect.size()-1).sendObject(this.setUpFileSync());
-		}catch(Nothingtosync e){}
 	}
 	public void removeCleint(TCPVerbindung tcp){
 		log.info("Client Disconected: " + tcp.getAddress());
@@ -133,7 +138,7 @@ public class Controller {
 				if(args[0].equalsIgnoreCase("dc")){
 					new Controller("", "", "","127.0.0.1", 4444, "Rechnungen");
 				}else if(args[0].equalsIgnoreCase("ds")){
-					new Controller("", "", "", 4444, "Rechnungen");
+					new Controller("", "", "", 4444, "Rechnungen1");
 				}else if(args[0].equalsIgnoreCase("s")){
 					new Controller("", "", "", Integer.parseInt(args[1]), args[2]);
 				}else if(args[0].equalsIgnoreCase("c")){

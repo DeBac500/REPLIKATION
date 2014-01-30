@@ -30,7 +30,7 @@ public class TCPClientRegistration implements Runnable {
 			t = new Thread(this);
 			this.start();
 		}catch(IOException ioe){  
-			this.controller.getLog().error("Can not bind to port: " + port); 
+			this.controller.getLog().severe("Can not bind to port: " + port); 
 			System.exit(0);
 		}
 	}
@@ -45,7 +45,7 @@ public class TCPClientRegistration implements Runnable {
 				this.controller.getLog().info("Waiting for a client ..."); 
 				this.controller.addClient(server.accept()); 
 			}catch(IOException ioe){
-				this.controller.getLog().error("Server accept error: \n" + ioe.getMessage());
+				this.controller.getLog().severe("Server accept error: \n" + ioe.getMessage());
 			}
 		}
 	}
