@@ -1,0 +1,75 @@
+\documentclass[a4paper,12pt]{scrreprt}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[table]{xcolor}% http://ctan.org/pkg/xcolor
+\usepackage{tabu}
+\usepackage{graphicx}
+\usepackage{lmodern}
+
+\begin{document}
+
+
+%\titlehead{Kopf} %Optionale Kopfzeile
+\author{Alexander Rieppel \and Dominik Backhausen} %Zwei Autoren
+\title{ Replikation } %Titel/Thema
+\subject{VSDB} %Fach
+\subtitle{ Protokoll } %Genaueres Thema, Optional
+\date{\today} %Datum
+\publishers{5AHITT} %Klasse
+
+\maketitle
+\tableofcontents
+
+
+\chapter{Aufgabenstellung}
+	Eine Handelsgesellschaft, die mehrere Filialen hat, betreibt eine Online-Plattform für den Verkauf der Produkte. Der Webshop wird mit Hilfe einer Datenbank betrieben. Bei dem Verkauf der Produkte werden Rechnungen in Form von PDF-Dokumenten erzeugt.\\\\
+	Aufgabenstellung:\\
+	Die Daten (Datenbank, Rechnungen) sollen stets auf die Filialrechner repliziert werden, damit die Sachbearbeiter vor Ort diese einsehen und bearbeiten können.\\\\
+	\begin{itemize}
+	\item Entwickle ein vereinfachtes Datenbankmodell für den Webshop
+	\item Wähle ein Konsistenzprotokoll Deiner Wahl (siehe Theorie bzw. Tanenbaum)
+	\item Implementiere einen Replikationsmanager in Java (JDBC, Sockets, o.ä. ...) für Datenbank und Rechnungen
+	\item alle Transaktionen im Zuge der Replikation sollen protokolliert werden (zum Beispiel mit Log4J)
+	\end{itemize}
+	Beispiel fuer Log-Eintrag:\\
+	Replikation Rechnungen München -> Berlin OKAY\\
+	Replikation DB MÜnchen -> Berlin FEHLGESCHLAGEN\\\\
+	Problemstellungen:
+	\begin{itemize}
+	\item Wie oft wird repliziert?
+	\item Wie erfolgt der Aufruf des Replikationsmanager bzw. läuft der Replikationsmanager stets im Hintergrund?
+	\item Was passiert im Fehlerfall?
+	\item Welche Probleme können auftreten? (Dateien mit gleichen Namen, Dateien mit gleichen Namen und unterschiedlicher Größe, Datensatz mit gleichem Schlüssel)
+	\end{itemize}
+	Meilensteine (16Pkt):
+	\begin{itemize}
+	\item Erstelle ein Replikationskonzept für diese Handelsgesellschaft (4 Punkte)
+	\item Implementiere dieses Konzept für zwei Rechner (6 Punkte)	mind. 10 Datensätze pro Tabelle, mind. 10 Rechnungen
+	\item Implementierung Logging (2 Punkte)
+	\item Dokumentiere drei Fehler-/Problemfälle und entsprechende Lösungvorschläge (4 Punkte)
+	\end{itemize}
+\chapter{Designüberlegung}
+\section{Allgemein}
+
+\section{Konsistenzmodell}
+	
+\chapter{Arbeitsaufteilung}
+	\tabulinesep = 4pt
+	\begin{tabu}  {|[2pt]X[2.5,c] |[1pt] X[4,c] |[1pt]X[1.3,c]|[1pt]X[c]|[2pt]}
+		\tabucline[2pt]{-}
+		Name & Arbeitssegment & Time Estimated & Time Spent\\\tabucline[2pt]{-}
+		
+		Alexander Rieppel & Datenbankverbindung & 1h & 2h\\\tabucline[1pt]{-}
+		Alexander Rieppel & Replikationsmanager & 4h & 0h\\\tabucline[1pt]{-}
+		Dominik Backhausen & Verbindung der Clients & 1h & 0.5h\\\tabucline[2pt]{-}
+		Dominik Backhausen & Replikationsmanager & 4h & 0h\\\tabucline[2pt]{-}
+		Gesamt && 10h & 15h\\\tabucline[2pt]{-}
+	\end{tabu}	
+\chapter{Arbeitsdurchführung}
+
+\chapter{Testbericht}
+\section{Fehlerszenarien}
+\chapter{Quellen}
+
+\end{document}
