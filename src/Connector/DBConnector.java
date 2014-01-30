@@ -1,11 +1,9 @@
 package Connector;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class DBConnector {
 	private String url;
@@ -30,20 +28,6 @@ public class DBConnector {
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
-		// finally {
-		// // finally block used to close resources
-		// try {
-		// if (stmt != null)
-		// conn.close();
-		// } catch (SQLException se) {
-		// }// do nothing
-		// try {
-		// if (conn != null)
-		// conn.close();
-		// } catch (SQLException se) {
-		// se.printStackTrace();
-		// }// end finally try
-		// }// end try
 	}
 
 	public ResultSet showTables() {
@@ -54,18 +38,11 @@ public class DBConnector {
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
-//		DatabaseMetaData md = null;
-//		try {
-//			md = this.conn.getMetaData();
-//			rs = md.getTables(null, null, "%", null);
-//		} catch (SQLException e) {
-//			System.err.println(e.getMessage());
-//		}
 		return rs;
 	}
 
 	public ResultSet showContent(String tablename) {
-		String sql = "SELECT * FROM "+tablename;
+		String sql = "SELECT * FROM " + tablename;
 		ResultSet rs = null;
 		try {
 			rs = conn.createStatement().executeQuery(sql);
