@@ -4,20 +4,32 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import Conection.TCPVerbindung;
-
+/**
+ * Beendet Verbindungen zum Client
+ * @author Dominik Backhausen
+ */
 public class Totengraeber implements Runnable{
 	private ArrayList<TCPVerbindung> tot;
 	private Thread thread;
 	private boolean run;
-	
+	/**
+	 * Konstruktor
+	 */
 	public Totengraeber(){
 		tot = new ArrayList<TCPVerbindung>();
 		run = true;
 		thread= new Thread(this);
 	}
+	/**
+	 * Fuegt tote hinzu
+	 * @param newdead
+	 */
 	public void addDead(TCPVerbindung newdead){
 		tot.add(newdead);
 	}
+	/**
+	 * Stopt thread
+	 */
 	public void stop(){
 		run = false;
 	}

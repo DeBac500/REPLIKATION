@@ -6,16 +6,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-
+/**
+ * Speicher Files
+ * @author Dominik Backhausen
+ */
 public class FileSaver implements Serializable{
 	private String name;
 	private byte[] bytes;
 	private long lastmodi;
-	
+	/**
+	 * Konstruktor
+	 * @param name
+	 */
 	public FileSaver(String name) {
 		this.name = name;
 	}
-	
+	/**
+	 * Speichern
+	 * @throws IOException
+	 */
 	public void read()throws IOException{
 		File f = new File("Rechnungen/"+name);
 		lastmodi = f.lastModified();
@@ -26,7 +35,11 @@ public class FileSaver implements Serializable{
 			fis.close();
 		}
 	}
-	
+	/**
+	 * Schreiben
+	 * @param path
+	 * @throws IOException
+	 */
 	public void write(String path) throws IOException{
 		File f = new File(path + "/" + name);
 		if(!f.exists()){
@@ -36,37 +49,18 @@ public class FileSaver implements Serializable{
 			fos.close();
 		}
 	}
-	
-	
+	/**
+	 * naem zurueck
+	 * @return
+	 */
 	public String getName() {
 		return name;
 	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
+	/**
+	 * Letzte aenderung zurueck
+	 * @return
+	 */
 	public long getLastmodi() {
 		return lastmodi;
 	}
-
-	public void setLastmodi(long lastmodi) {
-		this.lastmodi = lastmodi;
-	}
-
-	public static void main(String[] args){
-		FileSaver fs = new FileSaver("test.pdf");
-		try {
-			fs.read();
-			System.out.println("Read finished!");
-			Thread.sleep(1000);
-			fs.write("Rechnungen");
-			System.out.println("Write finished!");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	
 }
