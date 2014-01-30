@@ -1,5 +1,9 @@
 package Controller;
-
+/**
+ * Error wenn nichts zu syncen ist
+ * @author Dominik Backhausen
+ *
+ */
 public class Nothingtosync extends Exception {
 	public Nothingtosync (){
 		super ();

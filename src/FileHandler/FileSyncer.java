@@ -15,11 +15,17 @@ import Controller.Controller;
 import Controller.MyFilter;
 import Controller.Nothingtosync;
 import Controller.Syncable;
-
+/**
+ * Syncronisiert die Files
+ * @author Dominik Backhausen, Alexander Rieppel
+ */
 public class FileSyncer implements Syncable{
 	private HashMap<String,FileSaver> files;
 	private String path;
-	
+	/**
+	 * Konstruktor
+	 * @param path
+	 */
 	public FileSyncer(String path){
 		this.path = path;
 		files = new HashMap<String,FileSaver>();
@@ -117,6 +123,12 @@ public class FileSyncer implements Syncable{
 	    msg = "Sync finished";
 		return msg;
 	}
+	/**
+	 * Kopiert Files
+	 * @param from
+	 * @param path
+	 * @throws IOException
+	 */
 	public void copyFile(File from, String path) throws IOException{
 		FileInputStream in  = new FileInputStream(from);
 		File to = new File(path + "/CONFLICTED");

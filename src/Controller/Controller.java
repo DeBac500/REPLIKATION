@@ -14,7 +14,11 @@ import Conection.TCPClientRegistration;
 import Conection.TCPVerbindung;
 import FileHandler.Directory;
 import FileHandler.FileSyncer;
-
+/**
+ * Controller des Programms
+ * @author Dominik Backhausen, Alexander Rieppel
+ *
+ */
 public class Controller {
 	private TCPClientRegistration tcpreg;
 	private ArrayList<TCPVerbindung> conect;
@@ -25,7 +29,18 @@ public class Controller {
 	private Logger log;
 	private String rechp;
 	private Directory dir;
-	
+	/**
+	 * Konstruktor
+	 * @param dburl
+	 * @param dbusr
+	 * @param dbpwd
+	 * @param server
+	 * @param port
+	 * @param rechp
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 * @throws Nothingtosync
+	 */
 	public Controller(String dburl, String dbusr, String dbpwd, String server, int port,String rechp) throws UnknownHostException, IOException, Nothingtosync{
 		log = Logger.getLogger("REPLI");
 		log.setLevel(Level.INFO);
@@ -45,6 +60,14 @@ public class Controller {
 		ui.start();
 		log.info("Client started");
 	}
+	/**
+	 * Konstruktor
+	 * @param dburl
+	 * @param dbusr
+	 * @param dbpwd
+	 * @param port
+	 * @param rechp
+	 */
 	public Controller(String dburl, String dbusr, String dbpwd, int port,String rechp){
 		log = Logger.getLogger("REPLIKATION");
 		log.setLevel(Level.INFO);
@@ -63,6 +86,9 @@ public class Controller {
 		ui.start();
 		log.info("Server started!");
 	}
+	/**
+	 * Überprueft den File Pfad
+	 */
 	public void checkPath(){
 		File p = new File(this.rechp);
 		if(p.exists()){
@@ -76,12 +102,20 @@ public class Controller {
 			log.info("Path created");
 		}
 	}
-	
+	/**
+	 * Fuegt Clients hinzu
+	 * @param socket
+	 * @throws IOException
+	 */
 	public void addClient(Socket socket) throws IOException{
 		log.info("New Client connected: " + socket.getInetAddress().getHostAddress());
 		conect.add(new TCPVerbindung(this, socket));
 		conect.get(conect.size()-1).openConection();
 	}
+	/**
+	 * Loescht Clients
+	 * @param tcp
+	 */
 	public void removeCleint(TCPVerbindung tcp){
 		log.info("Client Disconnected: " + tcp.getAddress());
 		conect.remove(tcp);
@@ -91,11 +125,19 @@ public class Controller {
 			tcp.closeConection();
 		}
 	}
+	/**
+	 * Sendet an alle Clients
+	 * @param o
+	 * @throws IOException
+	 */
 	public void send(Object o) throws IOException{
 		for(TCPVerbindung temp : conect){
 			temp.sendObject(o);
 		}
 	}
+	/**
+	 * Beendet den Server
+	 */
 	public void shutdown(){
 		log.info("Shutting down...");
 		try {
@@ -113,22 +155,47 @@ public class Controller {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Erstellt ein FileSync
+	 * @return
+	 * @throws Nothingtosync
+	 * @throws IOException
+	 */
 	public FileSyncer setUpFileSync() throws Nothingtosync, IOException{
 		FileSyncer sync = new FileSyncer(this.rechp);
 		sync.setUp(this.dir);
 		return sync;
 	}
+	/**
+	 * Gibt Logger zurueck
+	 * @return
+	 */
 	public Logger getLog(){
 		return this.log;
 	}
+	/**
+	 * Gibt Pfad zurueck
+	 * @return
+	 */
 	public String getPath(){
 		return this.rechp;
 	}
+	/**
+	 * Gibt directory zurueck
+	 * @return
+	 */
 	public Directory getDir(){
 		return this.dir;
 	}
+	/**
+	 * Gibt An ob client oder Server
+	 * @return
+	 */
 	public boolean getClient(){return this.client;}
-	
+	/**
+	 * Main
+	 * @param args
+	 */
 	public static void main(String[] args){
 		try{
 			boolean wronginput = false;
@@ -157,7 +224,7 @@ public class Controller {
 				System.out.println("<f> <N> <ArraySize> Testing the fact algorithm");
 				System.out.println("<s> <N> <ArraySize> Testing the sort algorithm");
 			}
-		}catch(NumberFormatException e){
+		} catch(NumberFormatException e){
 			System.err.println("Bitte richtige Zahlen eingaben!");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block

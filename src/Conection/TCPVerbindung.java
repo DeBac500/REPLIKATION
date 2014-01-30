@@ -9,7 +9,11 @@ import java.net.UnknownHostException;
 import Controller.Controller;
 import Controller.Syncable;
 import FileHandler.FileSyncer;
-
+/**
+ * Verbindung zu Cleints bzw Server
+ * @author Dominik Backhausen
+ *
+ */
 public class TCPVerbindung implements Runnable{
 	private int ID;
 	private Socket socket;
@@ -18,26 +22,43 @@ public class TCPVerbindung implements Runnable{
 	private Thread thread;
 	private boolean run;
 	private Controller c;
-	
+	/**
+	 * Konstruktor
+	 * @param c
+	 * @param host
+	 * @param port
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
 	public TCPVerbindung(Controller c, String host, int port) throws UnknownHostException, IOException{
 		this.c = c;
 		this.socket = new Socket(host, port);
 		thread = new Thread(this);
 	}
+	/**
+	 * Konsturktor
+	 * @param c
+	 * @param socket
+	 */
 	public TCPVerbindung(Controller c,Socket socket){
 		this.c = c;
 		this.ID = socket.getPort();
 		this.socket = socket;
 		thread = new Thread(this);
 	}
-	
+	/**
+	 * Oeffnet die Verbindung
+	 * @throws IOException
+	 */
 	public void openConection() throws IOException{
 		out = new ObjectOutputStream(socket.getOutputStream());
 		in = new ObjectInputStream(socket.getInputStream());
 		run = true;
 		thread.start();
 	}
-	
+	/**
+	 * Sliesst die Verbindung
+	 */
 	public void closeConection(){
 		try {
 			run = false;
@@ -49,10 +70,19 @@ public class TCPVerbindung implements Runnable{
 			System.exit(0);
 		}
 	}
+	/**
+	 * Sendet Objekte
+	 * @param o
+	 * @throws IOException
+	 */
 	public void sendObject(Object o) throws IOException{
 		out.writeObject(o);
 		out.flush();
 	}
+	/**
+	 * Gibt Zieladdresse Zurueck
+	 * @return
+	 */
 	public String getAddress(){
 		return socket.getInetAddress().getHostAddress();
 	}
