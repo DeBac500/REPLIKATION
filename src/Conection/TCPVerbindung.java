@@ -7,8 +7,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import Controller.Controller;
+import FileHandler.FileSyncer;
 
 public class TCPVerbindung implements Runnable{
+	private int ID;
 	private Socket socket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
@@ -23,6 +25,7 @@ public class TCPVerbindung implements Runnable{
 	}
 	public TCPVerbindung(Controller c,Socket socket){
 		this.c = c;
+		this.ID = socket.getPort();
 		this.socket = socket;
 		thread = new Thread(this);
 	}
@@ -34,26 +37,44 @@ public class TCPVerbindung implements Runnable{
 		thread.start();
 	}
 	
-	public void closeConection() throws IOException{
-		run = false;
-		out.close();
-		in.close();
-		socket.close();
+	public void closeConection(){
+		try {
+			run = false;
+			out.close();
+			in.close();
+			socket.close();
+		} catch (IOException e) {
+			this.c.getLog().error("ERROR duaring closing conection");
+			System.exit(0);
+		}
 	}
 	public void sendObject(Object o) throws IOException{
 		out.writeObject(o);
 		out.flush();
 	}
+	public String getAddress(){
+		return socket.getInetAddress().getHostAddress();
+	}
 	@Override
 	public void run() {
+		this.c.getLog().info("Starting Listening");
 		try{
 			while(run){
-				
+				Thread.sleep(10);
+	    		Object o = in.readObject();
+	    		if(o instanceof FileSyncer){
+	    			FileSyncer sync = (FileSyncer)o;
+	    			sync.sync(this.c.getPath());
+	    		}
 			}
-			this.closeConection();
-		}catch(IOException e){
-			
+
+		} catch(IOException e){
+			this.c.getLog().error("ERROR 404!!");
+		} catch (InterruptedException e) {
+		} catch (ClassNotFoundException e) {
+			this.c.getLog().error("Could not receave Objekt!!");
 		}
+		this.closeConection();
 	}
 
 }

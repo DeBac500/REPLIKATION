@@ -1,9 +1,14 @@
 package FileHandler;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import Controller.Controller;
 import Controller.MyFilter;
@@ -11,21 +16,16 @@ import Controller.Nothingtosync;
 import Controller.Syncable;
 
 public class FileSyncer implements Syncable{
-	private ArrayList<FileSaver> files;
+	private HashMap<String,FileSaver> files;
 	private String path;
 	
 	public FileSyncer(String path){
 		this.path = path;
-		files = new ArrayList<FileSaver>();
+		files = new HashMap<String,FileSaver>();
 	}
+	
 	@Override
-	public String sync(String path) {
-		String msg = "Not Implemented!";
-		
-		return msg;
-	}
-	@Override
-	public void setUp() throws Nothingtosync, IOException{
+	public void setUp(Directory d) throws  IOException{
 		File dir = new File(this.path);
 		boolean direx = false;
 		
@@ -35,25 +35,91 @@ public class FileSyncer implements Syncable{
 			if(dir.mkdirs())
 				direx =  true;
 		
-		File[] todo = dir.listFiles(new MyFilter());
-		if(todo.length <= 0){
-			throw new Nothingtosync();
-		}else{
-			for(int i = 0; i < todo.length; i++){
-				files.add(new FileSaver(todo[i].getName()));
-				files.get(i).read();
+		if(direx){
+			for( File temp : dir.listFiles(new MyFilter())){
+				try{
+					if(d.newer(temp.getName(), temp.lastModified())){
+						FileSaver s = new FileSaver(temp.getName());
+						s.read();
+						files.put(temp.getName(), s);
+					}
+				}catch(Nothingtosync e){}
 			}
 		}
 	}
-	public static void main(String[] args){
-//		FileSyncer s = new FileSyncer("Rechnungen");
-//		try {
-//			s.setUp();
-//		} catch (Nothingtosync e) {
-//			System.out.println("Nothing to sync");
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+
+	@Override
+	public String syncClient(String path, Directory dir) {
+		String msg = "";
+		File f = new File(path);
+		if(!f.exists())
+			f.mkdirs();
+		if(f.isDirectory()){
+			for(File temp : f.listFiles(new MyFilter())){
+				if(files.containsKey(temp.getName())){
+					FileSaver s = files.get(temp.getName());
+					try {
+						if(dir.newer(s.getName(),s.getLastmodi())){
+							if(dir.newer(temp.getName(), temp.lastModified()))
+								this.copyFile(temp, path);
+						}else{
+							this.copyFile(temp, path);
+						}
+						temp.delete();
+						s.write(path);
+					} catch (Nothingtosync e) {
+					} 
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+					files.remove(temp.getName());
+				}
+			}
+			if(files.size() > 0){
+				Iterator it = files.entrySet().iterator();
+			    while (it.hasNext()) {
+			    	try{
+				        FileSaver s = (FileSaver) it.next();
+				        s.write(path);
+			    	}catch(IOException e){e.printStackTrace();}
+			    }
+			}
+			msg = "Sync finished";
+		}else
+			msg = "No Directory";
+		return msg;
+	}
+
+	@Override
+	public String syncServer(String path,Controller c) {
+		String msg ="";
+		Iterator it = files.entrySet().iterator();
+	    while (it.hasNext()) {
+	    	try{
+		        FileSaver s = (FileSaver) it.next();
+		        new File(path + "/" + s.getName()).delete();
+		        s.write(path);
+	    	}catch(IOException e){e.printStackTrace();}
+	    }
+	    msg = "Sync finished";
+		return msg;
+	}
+	public void copyFile(File from, String path) throws IOException{
+		FileInputStream in  = new FileInputStream(from);
+		File to = new File(path + "/CONFLICTED");
+		if(to.exists())
+			to.mkdirs();
+		else{
+			to = new File(path + "/CONFLICTED/" + from.getName());
+			if(!to.exists()){
+				to.createNewFile();
+				FileOutputStream out = new FileOutputStream(to);
+				byte[] temp = new byte[(int)from.length()];
+				in.read(temp);
+				out.write(temp);
+				out.close();
+			}
+		}
+		in.close();
 	}
 }

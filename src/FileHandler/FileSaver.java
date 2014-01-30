@@ -10,6 +10,7 @@ import java.io.Serializable;
 public class FileSaver implements Serializable{
 	private String name;
 	private byte[] bytes;
+	private long lastmodi;
 	
 	public FileSaver(String name) {
 		this.name = name;
@@ -17,6 +18,7 @@ public class FileSaver implements Serializable{
 	
 	public void read()throws IOException{
 		File f = new File("Rechnungen/"+name);
+		lastmodi = f.lastModified();
 		if(f.isFile()){
 			FileInputStream fis = new FileInputStream(f);
 			bytes = new byte[(int)f.length()];
@@ -25,8 +27,8 @@ public class FileSaver implements Serializable{
 		}
 	}
 	
-	public void write() throws IOException{
-		File f = new File("6*/testneu.pdf");
+	public void write(String path) throws IOException{
+		File f = new File(path + "/" + name);
 		if(!f.exists()){
 			f.createNewFile();
 			FileOutputStream fos = new FileOutputStream(f);
@@ -35,13 +37,30 @@ public class FileSaver implements Serializable{
 		}
 	}
 	
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public long getLastmodi() {
+		return lastmodi;
+	}
+
+	public void setLastmodi(long lastmodi) {
+		this.lastmodi = lastmodi;
+	}
+
 	public static void main(String[] args){
 		FileSaver fs = new FileSaver("test.pdf");
 		try {
 			fs.read();
 			System.out.println("Read Fertig!");
 			Thread.sleep(1000);
-			fs.write();
+			fs.write("Rechnungen");
 			System.out.println("write Fertig!");
 		} catch (IOException e) {
 			e.printStackTrace();
