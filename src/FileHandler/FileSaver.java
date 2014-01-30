@@ -58,10 +58,10 @@ public class FileSaver implements Serializable{
 		FileSaver fs = new FileSaver("test.pdf");
 		try {
 			fs.read();
-			System.out.println("Read Fertig!");
+			System.out.println("Read finished!");
 			Thread.sleep(1000);
 			fs.write("Rechnungen");
-			System.out.println("write Fertig!");
+			System.out.println("Write finished!");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

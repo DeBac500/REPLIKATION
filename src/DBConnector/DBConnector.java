@@ -1,18 +1,15 @@
-package Connector;
+package DBConnector;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.DatabaseMetaData;
 
 public class DBConnector {
 	private String url;
 	private String user;
 	private String pass;
 	private Connection conn = null;
-	private Statement stmt = null;
 
 	public DBConnector(String url, String user, String pass) {
 		this.url = url;
@@ -25,52 +22,30 @@ public class DBConnector {
 			System.out.println("Connecting to a selected database...");
 			setConn(DriverManager.getConnection(this.url, this.user, this.pass));
 			System.out.println("Connected successfully...");
-			stmt = conn.createStatement();
 
 		} catch (SQLException se) {
 			System.err.println(se.getMessage());
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
-		// finally {
-		// // finally block used to close resources
-		// try {
-		// if (stmt != null)
-		// conn.close();
-		// } catch (SQLException se) {
-		// }// do nothing
-		// try {
-		// if (conn != null)
-		// conn.close();
-		// } catch (SQLException se) {
-		// se.printStackTrace();
-		// }// end finally try
-		// }// end try
 	}
 
-	public ResultSet getTables() {
+	public ResultSet showTables() {
 		String sql = "show tables";
 		ResultSet rs = null;
 		try {
-			rs = stmt.executeQuery(sql);
+			rs = conn.createStatement().executeQuery(sql);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
-//		DatabaseMetaData md = null;
-//		try {
-//			md = this.conn.getMetaData();
-//			rs = md.getTables(null, null, "%", null);
-//		} catch (SQLException e) {
-//			System.err.println(e.getMessage());
-//		}
 		return rs;
 	}
 
-	public ResultSet getContent(String tablename) {
-		String sql = "SELECT * FROM "+tablename;
+	public ResultSet showContent(String tablename) {
+		String sql = "SELECT * FROM " + tablename;
 		ResultSet rs = null;
 		try {
-			rs = stmt.executeQuery(sql);
+			rs = conn.createStatement().executeQuery(sql);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
