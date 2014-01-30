@@ -68,7 +68,7 @@ public class Controller {
 		if(p.exists()){
 			if(!p.isDirectory())
 				if(p.isFile()){
-					log.severe("Path is a File!!\n Stopping Programm!");
+					log.severe("Path is a File!\n Stopping Programm!");
 					this.shutdown();
 				}
 		}else{
@@ -78,12 +78,12 @@ public class Controller {
 	}
 	
 	public void addClient(Socket socket) throws IOException{
-		log.info("New Client conected: " + socket.getInetAddress().getHostAddress());
+		log.info("New Client connected: " + socket.getInetAddress().getHostAddress());
 		conect.add(new TCPVerbindung(this, socket));
 		conect.get(conect.size()-1).openConection();
 	}
 	public void removeCleint(TCPVerbindung tcp){
-		log.info("Client Disconected: " + tcp.getAddress());
+		log.info("Client Disconnected: " + tcp.getAddress());
 		conect.remove(tcp);
 		if(tot!= null)
 			tot.addDead(tcp);
@@ -97,7 +97,7 @@ public class Controller {
 		}
 	}
 	public void shutdown(){
-		log.info("Programm closing...");
+		log.info("Shutting down...");
 		try {
 			if(ui != null)ui.stop();
 			if(tcpreg != null)tcpreg.stop();

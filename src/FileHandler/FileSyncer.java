@@ -43,7 +43,7 @@ public class FileSyncer implements Syncable{
 						FileSaver s = new FileSaver(temp.getName());
 						s.read();
 						files.put(temp.getName(), s);
-						System.out.println("Laden.. " + temp.getName());
+						System.out.println("Loading... " + temp.getName());
 					}
 				}catch(Nothingtosync e){}
 			}

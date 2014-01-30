@@ -45,7 +45,7 @@ public class TCPVerbindung implements Runnable{
 			in.close();
 			socket.close();
 		} catch (IOException e) {
-			this.c.getLog().severe("ERROR duaring closing conection");
+			this.c.getLog().severe("ERROR during process of 'close connection'");
 			System.exit(0);
 		}
 	}
@@ -73,10 +73,10 @@ public class TCPVerbindung implements Runnable{
 			}
 
 		} catch(IOException e){
-			this.c.getLog().severe("ERROR 404!!");
+			this.c.getLog().severe("ERROR 404!");
 		} catch (InterruptedException e) {
 		} catch (ClassNotFoundException e) {
-			this.c.getLog().severe("Could not receave Objekt!!");
+			this.c.getLog().severe("Could not receave Object!");
 		}
 		this.closeConection();
 	}

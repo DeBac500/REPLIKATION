@@ -46,13 +46,13 @@ public class UserInterface implements Runnable{
 		}else if(in.equalsIgnoreCase("exit")){
 			this.controller.shutdown();
 		}else
-			System.out.println("Invalide Command \nType sync or exit");
+			System.out.println("Invalid command \nType sync or exit");
 	}
 	public void handleSInput(String in){
 		if(in.equalsIgnoreCase("exit")){
 			this.controller.shutdown();
 		}else
-			System.out.println("Invalide Command \nType exit");
+			System.out.println("Invalid command \nType exit");
 	}
 
 }

@@ -30,7 +30,7 @@ public class TCPClientRegistration implements Runnable {
 			t = new Thread(this);
 			this.start();
 		}catch(IOException ioe){  
-			this.controller.getLog().severe("Can not bind to port: " + port); 
+			this.controller.getLog().severe("Can't bind to port: " + port); 
 			System.exit(0);
 		}
 	}
