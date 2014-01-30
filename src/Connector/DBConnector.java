@@ -12,7 +12,6 @@ public class DBConnector {
 	private String user;
 	private String pass;
 	private Connection conn = null;
-	private Statement stmt = null;
 
 	public DBConnector(String url, String user, String pass) {
 		this.url = url;
@@ -25,7 +24,6 @@ public class DBConnector {
 			System.out.println("Connecting to a selected database...");
 			setConn(DriverManager.getConnection(this.url, this.user, this.pass));
 			System.out.println("Connected successfully...");
-			stmt = conn.createStatement();
 
 		} catch (SQLException se) {
 			System.err.println(se.getMessage());
@@ -52,7 +50,7 @@ public class DBConnector {
 		String sql = "show tables";
 		ResultSet rs = null;
 		try {
-			rs = stmt.executeQuery(sql);
+			rs = conn.createStatement().executeQuery(sql);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -70,7 +68,7 @@ public class DBConnector {
 		String sql = "SELECT * FROM "+tablename;
 		ResultSet rs = null;
 		try {
-			rs = stmt.executeQuery(sql);
+			rs = conn.createStatement().executeQuery(sql);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
