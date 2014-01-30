@@ -8,4 +8,8 @@
 
 .project
 .classpath
+*.aux
+*.log
+*.synctex.gz
+*.toc
 
