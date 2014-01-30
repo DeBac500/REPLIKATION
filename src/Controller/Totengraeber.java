@@ -42,8 +42,6 @@ public class Totengraeber implements Runnable{
 			}
 		}catch(InterruptedException e){
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 

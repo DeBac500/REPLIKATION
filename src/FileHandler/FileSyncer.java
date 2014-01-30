@@ -84,6 +84,10 @@ public class FileSyncer implements Syncable{
 			    	}catch(IOException e){e.printStackTrace();}
 			    }
 			}
+			try {
+				dir.setUp();
+			} catch (Nothingtosync e) {
+			}
 			msg = "Sync finished";
 		}else
 			msg = "No Directory";
@@ -101,6 +105,12 @@ public class FileSyncer implements Syncable{
 		        s.write(path);
 	    	}catch(IOException e){e.printStackTrace();}
 	    }
+	    try {
+			c.send(this);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	    msg = "Sync finished";
 		return msg;
 	}
