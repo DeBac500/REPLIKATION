@@ -157,7 +157,7 @@ public class Controller {
 				System.out.println("<f> <N> <ArraySize> Testing the fact algorithm");
 				System.out.println("<s> <N> <ArraySize> Testing the sort algorithm");
 			}
-		}catch(NumberFormatException e){
+		} catch(NumberFormatException e){
 			System.err.println("Bitte richtige Zahlen eingaben!");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
