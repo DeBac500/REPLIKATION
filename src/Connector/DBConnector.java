@@ -1,11 +1,11 @@
 package Connector;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.DatabaseMetaData;
 
 public class DBConnector {
 	private String url;
@@ -48,7 +48,7 @@ public class DBConnector {
 		// }// end try
 	}
 
-	public ResultSet getTables() {
+	public ResultSet showTables() {
 		String sql = "show tables";
 		ResultSet rs = null;
 		try {
@@ -66,7 +66,7 @@ public class DBConnector {
 		return rs;
 	}
 
-	public ResultSet getContent(String tablename) {
+	public ResultSet showContent(String tablename) {
 		String sql = "SELECT * FROM "+tablename;
 		ResultSet rs = null;
 		try {
