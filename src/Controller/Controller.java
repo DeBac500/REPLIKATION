@@ -1,5 +1,6 @@
 package Controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -54,6 +55,19 @@ public class Controller {
 		dir=null;
 		log.info("Server started!");
 	}
+	public void checkPath(){
+		File p = new File(this.rechp);
+		if(p.exists()){
+			if(!p.isDirectory())
+				if(p.isFile()){
+					log.error("Path is a File!!\n Stopping Programm!");
+					this.shutdown();
+				}
+		}else{
+			p.mkdirs();
+			log.info("Path created");
+		}
+	}
 	
 	public void addClient(Socket socket) throws IOException{
 		log.info("New Client conected: " + socket.getInetAddress().getHostAddress());
@@ -66,7 +80,16 @@ public class Controller {
 	public void removeCleint(TCPVerbindung tcp){
 		log.info("Client Disconected: " + tcp.getAddress());
 		conect.remove(tcp);
-		tot.addDead(tcp);
+		if(tot!= null)
+			tot.addDead(tcp);
+		else{
+			tcp.closeConection();
+		}
+	}
+	public void send(Object o) throws IOException{
+		for(TCPVerbindung temp : conect){
+			temp.sendObject(o);
+		}
 	}
 	public void shutdown(){
 		log.info("Programm closing...");
@@ -87,7 +110,7 @@ public class Controller {
 	}
 	public FileSyncer setUpFileSync() throws Nothingtosync, IOException{
 		FileSyncer sync = new FileSyncer(this.rechp);
-		sync.setUp();
+		sync.setUp(this.dir);
 		return sync;
 	}
 	public Logger getLog(){
@@ -95,5 +118,51 @@ public class Controller {
 	}
 	public String getPath(){
 		return this.rechp;
+	}
+	public Directory getDir(){
+		return this.dir;
+	}
+	public boolean getClient(){return this.client;}
+	
+	public static void main(String[] args){
+		try{
+			boolean wronginput = false;
+			if(!(args.length >= 1)){
+				wronginput =true;
+			}else{
+				if(args[0].equalsIgnoreCase("dc")){
+					new Controller("", "", "","127.0.0.1", 4444, "Rechnungen");
+				}else if(args[0].equalsIgnoreCase("ds")){
+					new Controller("", "", "", 4444, "Rechnungen");
+				}else if(args[0].equalsIgnoreCase("s")){
+					new Controller("", "", "", Integer.parseInt(args[1]), args[2]);
+				}else if(args[0].equalsIgnoreCase("c")){
+					new Controller("", "", "", args[1],  Integer.parseInt(args[2]), args[3]);
+				}else
+					wronginput = true;
+			}
+			if(wronginput){
+				System.out.println("Please enter one of the following options:");
+				System.out.println("The default options with 50 Tests(N) and 5000 ArraySize");
+				System.out.println("<d> Testing both algorithm");
+				System.out.println("<fd> Testing the fact algorithm");
+				System.out.println("<sd> Testing the sort algorithm");
+				System.out.println("The custom options with custom arraysizes");
+				System.out.println("<b> <N> <ArraySize> Testing both algorithm ");
+				System.out.println("<f> <N> <ArraySize> Testing the fact algorithm");
+				System.out.println("<s> <N> <ArraySize> Testing the sort algorithm");
+			}
+		}catch(NumberFormatException e){
+			System.err.println("Bitte richtige Zahlen eingaben!");
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Nothingtosync e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

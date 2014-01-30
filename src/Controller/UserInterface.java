@@ -1,5 +1,6 @@
 package Controller;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class UserInterface implements Runnable{
@@ -22,11 +23,33 @@ public class UserInterface implements Runnable{
 	@Override
 	public void run() {
 		while(run){
-			this.handleInput(in.nextLine());
+			if(this.controller.getClient())
+				this.handleCInput(in.nextLine());
+			else
+				this.handleSInput(in.nextLine());
 		}
 	}
-	public void handleInput(String in){
-		System.out.println(in);
+	public void handleCInput(String in){
+		if(in.equalsIgnoreCase("sync")){
+			try {
+				this.controller.send(this.controller.setUpFileSync());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Nothingtosync e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if(in.equalsIgnoreCase("exit")){
+			this.controller.shutdown();
+		}else
+			System.out.println("Invalide Command \nType sync or exit");
+	}
+	public void handleSInput(String in){
+		if(in.equalsIgnoreCase("exit")){
+			this.controller.shutdown();
+		}else
+			System.out.println("Invalide Command \nType exit");
 	}
 
 }

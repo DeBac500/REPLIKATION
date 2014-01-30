@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import Controller.Controller;
+import Controller.Syncable;
 import FileHandler.FileSyncer;
 
 public class TCPVerbindung implements Runnable{
@@ -62,9 +63,12 @@ public class TCPVerbindung implements Runnable{
 			while(run){
 				Thread.sleep(10);
 	    		Object o = in.readObject();
-	    		if(o instanceof FileSyncer){
-	    			FileSyncer sync = (FileSyncer)o;
-	    			sync.sync(this.c.getPath());
+	    		if(o instanceof Syncable){
+	    			Syncable s = (Syncable)o;
+	    			if(this.c.getClient())
+	    				s.syncClient(this.c.getPath(), this.c.getDir());
+	    			else
+	    				s.syncServer(this.c.getPath(), this.c);
 	    		}
 			}
 
