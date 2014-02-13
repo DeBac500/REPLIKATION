@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import Conection.TCPVerbindung;
 import Controller.Controller;
 import Controller.MyFilter;
 import Controller.Nothingtosync;
@@ -22,6 +23,7 @@ import Controller.Syncable;
 public class FileSyncer implements Syncable{
 	private HashMap<String,FileSaver> files;
 	private String path;
+	private Directory d;
 	/**
 	 * Konstruktor
 	 * @param path
@@ -32,10 +34,10 @@ public class FileSyncer implements Syncable{
 	}
 	
 	@Override
-	public void setUp(Directory d) throws  IOException{
+	public void setUp(Controller c) throws  IOException{
 		File dir = new File(this.path);
 		boolean direx = false;
-		
+		this.d=c.getDir();
 		if(dir.exists())
 			direx = true;
 		else
@@ -52,20 +54,21 @@ public class FileSyncer implements Syncable{
 					}else{
 						load(temp);
 					}
-				}catch(Nothingtosync e){}
+				}catch(Nothingtosync e){load(temp);}
 			}
 		}
+		
 	}
 	
-	public void load(File temp) throws IOException{
+	public void load(File temp){
 		FileSaver s = new FileSaver(temp.getName());
-		s.read();
+		s.read(this.path);
 		files.put(temp.getName(), s);
 		System.out.println("Loading... " + temp.getName());
 	}
 
 	@Override
-	public String syncClient(String path, Directory dir) {
+	public String syncClient(String path, Controller c,TCPVerbindung tcp) {
 		String msg = "";
 		File f = new File(path);
 		if(!f.exists())
@@ -75,14 +78,22 @@ public class FileSyncer implements Syncable{
 				if(files.containsKey(temp.getName())){
 					FileSaver s = files.get(temp.getName());
 					try {
-						if(dir.newer(s.getName(),s.getLastmodi())){
-							if(dir.newer(temp.getName(), temp.lastModified()))
+						if(c.getDir().newer(s.getName(),s.getLastmodi())){
+							if(c.getDir().newer(temp.getName(), temp.lastModified()))
 								this.copyFile(temp, path);
 						}else{
 							this.copyFile(temp, path);
 						}
 						temp.delete();
-						s.write(path);
+						if(s.write(path)){
+				        	String send = s.getName() + ": "+ tcp.getAddressEnd() + " -> " + tcp.getAddress() + " OKAY";
+							tcp.sendObject(send);
+							c.getLog().info(send);
+						}else{
+							String send = s.getName() + ": "+ tcp.getAddressEnd() + " -> " + tcp.getAddress() + " FEHLGESCHLAGEN";
+							tcp.sendObject(send);
+							c.getLog().info(send);
+						}
 					} catch (Nothingtosync e) {
 					} 
 					catch (IOException e) {
@@ -98,12 +109,20 @@ public class FileSyncer implements Syncable{
 			    		Map.Entry pairs = (Map.Entry)it.next();
 			    		FileSaver s = (FileSaver) pairs.getValue();
 				        new File(path + "/" + s.getName()).delete();
-				        s.write(path);
+				        if(s.write(path)){
+				        	String send = s.getName() + ": "+ tcp.getAddressEnd() + " -> " + tcp.getAddress() + " OKAY";
+							tcp.sendObject(send);
+							c.getLog().info(send);
+						}else{
+							String send = s.getName() + ": "+ tcp.getAddressEnd() + " -> " + tcp.getAddress() + " FEHLGESCHLAGEN";
+							tcp.sendObject(send);
+							c.getLog().info(send);
+						}
 			    	}catch(IOException e){e.printStackTrace();}
 			    }
 			}
 			try {
-				dir.setUp();
+				c.getDir().setUp();
 			} catch (Nothingtosync e) {
 			}
 			msg = "Sync finished";
@@ -113,7 +132,7 @@ public class FileSyncer implements Syncable{
 	}
 
 	@Override
-	public String syncServer(String path,Controller c) {
+	public String syncServer(String path,Controller c,TCPVerbindung tcp) {
 		System.out.println("Test");
 		String msg ="";
 		Iterator it = files.entrySet().iterator();
@@ -122,7 +141,15 @@ public class FileSyncer implements Syncable{
 	    		Map.Entry pairs = (Map.Entry)it.next();
 		        FileSaver s = (FileSaver) pairs.getValue();
 		        new File(path + "/" + s.getName()).delete();
-		        s.write(path);
+		        if(s.write(path)){
+		        	String send = s.getName() + ": "+ tcp.getAddressEnd() + " -> " + tcp.getAddress() + " OKAY";
+					tcp.sendObject(send);
+					c.getLog().info(send);
+				}else{
+					String send = s.getName() + ": "+ tcp.getAddressEnd() + " -> " + tcp.getAddress() + " FEHLGESCHLAGEN";
+					tcp.sendObject(send);
+					c.getLog().info(send);
+				}
 	    	}catch(IOException e){e.printStackTrace();}
 	    }
 	    try {
@@ -157,5 +184,9 @@ public class FileSyncer implements Syncable{
 			}
 		}
 		in.close();
+	}
+	
+	public Directory getDir(){
+		return this.d;
 	}
 }

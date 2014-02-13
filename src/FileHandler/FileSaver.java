@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
+import Controller.Nothingtosync;
+
 /**
  * Speicher Files
  * @author Dominik Backhausen
@@ -24,15 +26,24 @@ public class FileSaver implements Serializable{
 	/**
 	 * Speichern
 	 * @throws IOException
+	 * @throws Nothingtosync 
 	 */
-	public void read()throws IOException{
-		File f = new File("Rechnungen/"+name);
-		lastmodi = f.lastModified();
-		if(f.isFile()){
-			FileInputStream fis = new FileInputStream(f);
-			bytes = new byte[(int)f.length()];
-			fis.read(bytes);
-			fis.close();
+	public boolean read(String path){
+		try{
+			File f = new File(path + "/"+name);
+			if(f.isFile()){
+				lastmodi = f.lastModified();
+				FileInputStream fis = new FileInputStream(f);
+				bytes = new byte[(int)f.length()];
+				fis.read(bytes);
+				//System.out.println("ByteLänge: " + bytes.length);
+				fis.close();
+				return true;
+			}else{
+				return false;
+			}
+		}catch(IOException e){
+			return false;
 		}
 	}
 	/**
@@ -40,13 +51,20 @@ public class FileSaver implements Serializable{
 	 * @param path
 	 * @throws IOException
 	 */
-	public void write(String path) throws IOException{
-		File f = new File(path + "/" + name);
-		if(!f.exists()){
-			f.createNewFile();
-			FileOutputStream fos = new FileOutputStream(f);
-			fos.write(bytes);
-			fos.close();
+	public boolean write(String path){
+		try{
+			File f = new File(path + "/" + name);
+			if(!f.exists()){
+				f.createNewFile();
+				FileOutputStream fos = new FileOutputStream(f);
+				//System.out.println("ByteLänge: " + bytes.length);
+				fos.write(bytes);
+				fos.close();
+				return true;
+			}else
+				return false;
+		}catch(IOException e){
+			return false;
 		}
 	}
 	/**

@@ -23,14 +23,14 @@ public class TCPClientRegistration implements Runnable {
 	public TCPClientRegistration(Controller sc, int port) {
 		this.controller = sc;
 		try{  
-			this.controller.getLog().info("Binding to port " + port + ", please wait  ...");
+			System.out.println("Binding to port " + port + ", please wait  ...");
 			server = new ServerSocket(port);  
-			this.controller.getLog().info("Server started: " + server);
+			System.out.println("Server started: " + server);
 			run = true;
 			t = new Thread(this);
 			this.start();
 		}catch(IOException ioe){  
-			this.controller.getLog().severe("Can't bind to port: " + port); 
+			System.out.println("Can't bind to port: " + port); 
 			System.exit(0);
 		}
 	}
@@ -42,10 +42,10 @@ public class TCPClientRegistration implements Runnable {
 	public void run() {
 		while (run){
 			try{
-				this.controller.getLog().info("Waiting for a client ..."); 
+				System.out.println("Waiting for a client ..."); 
 				this.controller.addClient(server.accept()); 
 			}catch(IOException ioe){
-				this.controller.getLog().severe("Server accept error: \n" + ioe.getMessage());
+				System.out.println("Server accept error: \n" + ioe.getMessage());
 			}
 		}
 	}

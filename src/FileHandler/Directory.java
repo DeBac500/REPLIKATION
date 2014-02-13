@@ -1,6 +1,7 @@
 package FileHandler;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.HashMap;
 
 import Controller.MyFilter;
@@ -9,7 +10,7 @@ import Controller.Nothingtosync;
  * Speichert die Informationen von Files
  * @author Dominik Backhasuen, Alexander Rieppel
  */
-public class Directory {
+public class Directory implements Serializable{
 	private HashMap<String , Long> file;
 	private String path;
 	/**

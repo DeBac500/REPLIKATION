@@ -6,9 +6,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import Conection.TCPClientRegistration;
 import Conection.TCPVerbindung;
@@ -41,10 +43,23 @@ public class Controller {
 	 * @throws IOException
 	 * @throws Nothingtosync
 	 */
-	public Controller(String dburl, String dbusr, String dbpwd, String server, int port,String rechp) throws UnknownHostException, IOException, Nothingtosync{
-		log = Logger.getLogger("REPLI");
-		log.setLevel(Level.INFO);
-		log.info("Starting Client...");
+	public Controller(String dburl, String dbusr, String dbpwd, String server, int port,String rechp,String logp) throws UnknownHostException, IOException, Nothingtosync{
+		log = Logger.getRootLogger();
+		
+		PatternLayout layout1 = new PatternLayout("%m%n");
+		PatternLayout layout = new PatternLayout( "%d{dd-MM-yyyy HH:mm:ss} REP %m%n" );
+		FileAppender fileAppender = new FileAppender( layout1, logp, true );
+		log.addAppender(fileAppender);
+		log.setLevel(Level.ALL);
+		log.info("------------------------------------------------------------------------------------------------");
+		log.removeAppender(fileAppender);
+		fileAppender = new FileAppender( layout, logp, true );
+		ConsoleAppender consoleAppender = new ConsoleAppender( layout );
+		log.addAppender(consoleAppender);
+		log.addAppender(fileAppender);
+		
+		
+		System.out.println("Starting Client...");
 		client = true;
 		this.dburl = dburl;
 		this.dbusr =dbusr;
@@ -58,7 +73,7 @@ public class Controller {
 		dir.setUp();
 		ui = new UserInterface(this);
 		ui.start();
-		log.info("Client started");
+		System.out.println("Client started");
 	}
 	/**
 	 * Konstruktor
@@ -67,11 +82,24 @@ public class Controller {
 	 * @param dbpwd
 	 * @param port
 	 * @param rechp
+	 * @throws IOException 
 	 */
-	public Controller(String dburl, String dbusr, String dbpwd, int port,String rechp){
-		log = Logger.getLogger("REPLIKATION");
-		log.setLevel(Level.INFO);
-		log.info("Starting Server..");
+	public Controller(String dburl, String dbusr, String dbpwd, int port,String rechp,String logp) throws IOException{
+		log = Logger.getRootLogger();
+		
+		PatternLayout layout1 = new PatternLayout("%m%n");
+		PatternLayout layout = new PatternLayout( "%d{dd-MM-yyyy HH:mm:ss} REP %m%n" );
+		FileAppender fileAppender = new FileAppender( layout1, logp, true );
+		log.addAppender(fileAppender);
+		log.setLevel(Level.ALL);
+		log.info("------------------------------------------------------------------------------------------------");
+		log.removeAppender(fileAppender);
+		fileAppender = new FileAppender( layout, logp, true );
+		ConsoleAppender consoleAppender = new ConsoleAppender( layout );
+		log.addAppender(consoleAppender);
+		log.addAppender(fileAppender);
+		
+		System.out.println("Starting Server..");
 		client = false;
 		this.dburl = dburl;
 		this.dbusr =dbusr;
@@ -84,7 +112,7 @@ public class Controller {
 		dir=null;
 		ui = new UserInterface(this);
 		ui.start();
-		log.info("Server started!");
+		System.out.println("Server started!");
 	}
 	/**
 	 * Überprueft den File Pfad
@@ -94,12 +122,12 @@ public class Controller {
 		if(p.exists()){
 			if(!p.isDirectory())
 				if(p.isFile()){
-					log.severe("Path is a File!\n Stopping Programm!");
+					System.err.println("Path is a File!\n Stopping Programm!");
 					this.shutdown();
 				}
 		}else{
 			p.mkdirs();
-			log.info("Path created");
+			System.out.println("Path: " +this.rechp +"created");
 		}
 	}
 	/**
@@ -108,7 +136,7 @@ public class Controller {
 	 * @throws IOException
 	 */
 	public void addClient(Socket socket) throws IOException{
-		log.info("New Client connected: " + socket.getInetAddress().getHostAddress());
+		System.out.println("New Client connected: " + socket.getInetAddress().getHostAddress());
 		conect.add(new TCPVerbindung(this, socket));
 		conect.get(conect.size()-1).openConection();
 	}
@@ -117,7 +145,7 @@ public class Controller {
 	 * @param tcp
 	 */
 	public void removeCleint(TCPVerbindung tcp){
-		log.info("Client Disconnected: " + tcp.getAddress());
+		System.out.println("Client Disconnected: " + tcp.getAddress());
 		conect.remove(tcp);
 		if(tot!= null)
 			tot.addDead(tcp);
@@ -139,7 +167,7 @@ public class Controller {
 	 * Beendet den Server
 	 */
 	public void shutdown(){
-		log.info("Shutting down...");
+		System.out.println("Shutting down...");
 		try {
 			if(ui != null)ui.stop();
 			if(tcpreg != null)tcpreg.stop();
@@ -163,7 +191,13 @@ public class Controller {
 	 */
 	public FileSyncer setUpFileSync() throws Nothingtosync, IOException{
 		FileSyncer sync = new FileSyncer(this.rechp);
-		sync.setUp(this.dir);
+		sync.setUp(this);
+		return sync;
+	}
+	public FileSyncer setUpFileSync(Directory d) throws Nothingtosync, IOException{
+		FileSyncer sync = new FileSyncer(this.rechp);
+		this.dir =d;
+		sync.setUp(this);
 		return sync;
 	}
 	/**
@@ -203,13 +237,13 @@ public class Controller {
 				wronginput =true;
 			}else{
 				if(args[0].equalsIgnoreCase("dc")){
-					new Controller("", "", "","127.0.0.1", 4444, "Rechnungen");
+					new Controller("", "", "","127.0.0.1", 4444, "Rechnungen","replication.log");
 				}else if(args[0].equalsIgnoreCase("ds")){
-					new Controller("", "", "", 4444, "Rechnungen1");
+					new Controller("", "", "", 4444, "Rechnungen1","replication1.log");
 				}else if(args[0].equalsIgnoreCase("s")){
-					new Controller("", "", "", Integer.parseInt(args[1]), args[2]);
+					new Controller("", "", "", Integer.parseInt(args[1]), args[2],args[3]);
 				}else if(args[0].equalsIgnoreCase("c")){
-					new Controller("", "", "", args[1],  Integer.parseInt(args[2]), args[3]);
+					new Controller("", "", "", args[1],  Integer.parseInt(args[2]), args[3],args[4]);
 				}else
 					wronginput = true;
 			}

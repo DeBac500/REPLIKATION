@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import Controller.Controller;
 import Controller.Nothingtosync;
 import Controller.Syncable;
+import FileHandler.Directory;
 import FileHandler.FileSyncer;
 /**
  * Verbindung zu Cleints bzw Server
@@ -67,7 +68,7 @@ public class TCPVerbindung implements Runnable{
 			in.close();
 			socket.close();
 		} catch (IOException e) {
-			this.c.getLog().severe("ERROR during process of 'close connection'");
+			System.err.println("ERROR during process of 'close connection'");
 			System.exit(0);
 		}
 	}
@@ -84,12 +85,15 @@ public class TCPVerbindung implements Runnable{
 	 * Gibt Zieladdresse Zurueck
 	 * @return
 	 */
-	public String getAddress(){
+	public String getAddressEnd(){
 		return socket.getInetAddress().getHostAddress();
+	}
+	public String getAddress(){
+		return socket.getLocalAddress().getHostAddress();
 	}
 	@Override
 	public void run() {
-		this.c.getLog().info("Starting Listening");
+		System.out.println("Starting Listening");
 		try{
 			while(run){
 				Thread.sleep(10);
@@ -97,12 +101,20 @@ public class TCPVerbindung implements Runnable{
 	    		if(o instanceof Syncable){
 	    			Syncable s = (Syncable)o;
 	    			if(this.c.getClient())
-	    				s.syncClient(this.c.getPath(), this.c.getDir());
+	    				s.syncClient(this.c.getPath(), this.c,this);
 	    			else{
-	    				s.syncServer(this.c.getPath(), this.c);
-	    				FileSyncer temp = this.c.setUpFileSync();
-	    				this.sendObject(temp);
+	    				s.syncServer(this.c.getPath(), this.c,this);
+	    				Directory dir = s.getDir();
+	    				if(dir != null){
+		    				FileSyncer temp = this.c.setUpFileSync(dir);
+		    				this.sendObject(temp);
+	    				}else{
+	    					//TODO DB
+	    				}
 	    			}
+	    		}
+	    		if(o instanceof String){
+	    			this.c.getLog().info((String)o);
 	    		}
 			}
 
@@ -110,7 +122,7 @@ public class TCPVerbindung implements Runnable{
 			this.c.removeCleint(this);
 		} catch (InterruptedException e) {
 		} catch (ClassNotFoundException e) {
-			this.c.getLog().severe("Could not receave Object!");
+			System.err.println("Could not receave Object!");
 		} catch (Nothingtosync e) {
 		}
 		this.closeConection();
