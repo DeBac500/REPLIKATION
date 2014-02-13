@@ -1,6 +1,7 @@
 package Controller;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import FileHandler.FileSyncer;
@@ -37,12 +38,14 @@ public class UserInterface implements Runnable{
 	}
 	@Override
 	public void run() {
-		while(run){
-			if(this.controller.getClient())
-				this.handleCInput(in.nextLine());
-			else
-				this.handleSInput(in.nextLine());
-		}
+		try{
+			while(run){
+				if(this.controller.getClient())
+					this.handleCInput(in.nextLine());
+				else
+					this.handleSInput(in.nextLine());
+			}
+		}catch(NoSuchElementException e){}
 	}
 	/**
 	 * Input verarbietung fuer Client

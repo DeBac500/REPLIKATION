@@ -214,6 +214,7 @@ public class Controller {
 					wronginput = true;
 			}
 			if(wronginput){
+				//TODO anpassen
 				System.out.println("Please enter one of the following options:");
 				System.out.println("The default options with 50 Tests(N) and 5000 ArraySize");
 				System.out.println("<d> Testing both algorithm");

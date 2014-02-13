@@ -45,15 +45,23 @@ public class FileSyncer implements Syncable{
 		if(direx){
 			for( File temp : dir.listFiles(new MyFilter())){
 				try{
-					if(d.newer(temp.getName(), temp.lastModified())){
-						FileSaver s = new FileSaver(temp.getName());
-						s.read();
-						files.put(temp.getName(), s);
-						System.out.println("Loading... " + temp.getName());
+					if(d != null){
+						if(d.newer(temp.getName(), temp.lastModified())){
+							load(temp);
+						}
+					}else{
+						load(temp);
 					}
 				}catch(Nothingtosync e){}
 			}
 		}
+	}
+	
+	public void load(File temp) throws IOException{
+		FileSaver s = new FileSaver(temp.getName());
+		s.read();
+		files.put(temp.getName(), s);
+		System.out.println("Loading... " + temp.getName());
 	}
 
 	@Override
@@ -87,7 +95,9 @@ public class FileSyncer implements Syncable{
 				Iterator it = files.entrySet().iterator();
 			    while (it.hasNext()) {
 			    	try{
-				        FileSaver s = (FileSaver) it.next();
+			    		Map.Entry pairs = (Map.Entry)it.next();
+			    		FileSaver s = (FileSaver) pairs.getValue();
+				        new File(path + "/" + s.getName()).delete();
 				        s.write(path);
 			    	}catch(IOException e){e.printStackTrace();}
 			    }
@@ -104,6 +114,7 @@ public class FileSyncer implements Syncable{
 
 	@Override
 	public String syncServer(String path,Controller c) {
+		System.out.println("Test");
 		String msg ="";
 		Iterator it = files.entrySet().iterator();
 	    while (it.hasNext()) {

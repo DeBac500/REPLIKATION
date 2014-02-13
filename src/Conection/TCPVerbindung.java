@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import Controller.Controller;
+import Controller.Nothingtosync;
 import Controller.Syncable;
 import FileHandler.FileSyncer;
 /**
@@ -97,16 +98,20 @@ public class TCPVerbindung implements Runnable{
 	    			Syncable s = (Syncable)o;
 	    			if(this.c.getClient())
 	    				s.syncClient(this.c.getPath(), this.c.getDir());
-	    			else
+	    			else{
 	    				s.syncServer(this.c.getPath(), this.c);
+	    				FileSyncer temp = this.c.setUpFileSync();
+	    				this.sendObject(temp);
+	    			}
 	    		}
 			}
 
 		} catch(IOException e){
-			this.c.getLog().severe("ERROR 404!");
+			this.c.removeCleint(this);
 		} catch (InterruptedException e) {
 		} catch (ClassNotFoundException e) {
 			this.c.getLog().severe("Could not receave Object!");
+		} catch (Nothingtosync e) {
 		}
 		this.closeConection();
 	}
