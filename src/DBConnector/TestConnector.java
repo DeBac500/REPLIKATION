@@ -11,20 +11,8 @@ public class TestConnector {
 	public static void main(String[] args) {
 		DBConnector db = new DBConnector("jdbc:mysql://localhost:25565/new",
 				"root", "root");
-		ResultSet rs = db.showTables();
-		ResultSet rs2 = db.showContent("genre2");
-		try {
-			while (rs.next()) {
-				System.out.println(rs.getString(1));
-			}
-			System.out.println();
-			while (rs2.next()) {
-				System.out.println(rs2.getString(1));
-			}
-		} catch (SQLException e1) {
-			System.err.println(e1.getMessage());
-		} catch (NullPointerException e2){
-			System.err.println(e2.getMessage());
-		}
+		db.triggerINS("genre2");
+//		db.triggerUPD("genre2");
+//		db.triggerDEL("genre2");
 	}
 }

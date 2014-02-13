@@ -23,3 +23,11 @@ END;
 |
 DELIMITER ;
 
+
+Tabelle test
+a1 , a2 , a3
+12 , 34 , 54
+
+'INSERT','genre2','gbez',12,NOW()
+'INSERT','genre2','gbez',34,NOW()
+'INSERT','genre2','gbez',54,NOW()
