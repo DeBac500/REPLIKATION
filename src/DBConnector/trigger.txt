@@ -1,0 +1,37 @@
+
+	
+CREATE TRIGGER log_INSERT AFTER INSERT ON genre2
+
+FOR EACH ROW
+
+BEGIN
+
+  INSERT INTO log_123 (action,tabn,row,value,times)
+  VALUES('INSERT','genre2','gbez',NEW.gbez,NOW());
+
+END;
+
+CREATE TRIGGER log_INSERT AFTER UPDATE ON genre2
+
+FOR EACH ROW
+
+BEGIN
+
+  INSERT INTO log_123 (action,tabn,row,value,times)
+  VALUES('UPDATE','genre2','gbez',NEW.gbez,NOW());
+
+END;
+
+CREATE TRIGGER log_INSERT BEFORE DELETE ON genre2
+
+FOR EACH ROW
+
+BEGIN
+
+  INSERT INTO log_123 (action,tabn,row,value,times)
+  VALUES('DELETE','genre2','gbez',OLD.gbez,NOW());
+
+END;
+
+
+

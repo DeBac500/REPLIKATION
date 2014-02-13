@@ -9,10 +9,10 @@ public class TestConnector {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		DBConnector db = new DBConnector("jdbc:mysql://localhost:25565/test",
+		DBConnector db = new DBConnector("jdbc:mysql://localhost:25565/new",
 				"root", "root");
 		ResultSet rs = db.showTables();
-		ResultSet rs2 = db.showContent("genre");
+		ResultSet rs2 = db.showContent("genre2");
 		try {
 			while (rs.next()) {
 				System.out.println(rs.getString(1));
@@ -23,6 +23,8 @@ public class TestConnector {
 			}
 		} catch (SQLException e1) {
 			System.err.println(e1.getMessage());
+		} catch (NullPointerException e2){
+			System.err.println(e2.getMessage());
 		}
 	}
 }
