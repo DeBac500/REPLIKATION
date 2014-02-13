@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.log4j.ConsoleAppender;
@@ -14,6 +15,7 @@ import org.apache.log4j.PatternLayout;
 
 import Conection.TCPClientRegistration;
 import Conection.TCPVerbindung;
+import DBHandler.DBConnector;
 import FileHandler.Directory;
 import FileHandler.FileSyncer;
 /**
@@ -26,11 +28,11 @@ public class Controller {
 	private ArrayList<TCPVerbindung> conect;
 	private Totengraeber tot;
 	private UserInterface ui;
-	private String dburl, dbusr, dbpwd;
 	private boolean client;
 	private Logger log;
 	private String rechp;
 	private Directory dir;
+	private DBConnector db;
 	/**
 	 * Konstruktor
 	 * @param dburl
@@ -43,7 +45,7 @@ public class Controller {
 	 * @throws IOException
 	 * @throws Nothingtosync
 	 */
-	public Controller(String dburl, String dbusr, String dbpwd, String server, int port,String rechp,String logp) throws UnknownHostException, IOException, Nothingtosync{
+	public Controller(String dburl, String dbusr, String dbpwd, String server, int port,String rechp,String logp) throws UnknownHostException, IOException{
 		log = Logger.getRootLogger();
 		
 		PatternLayout layout1 = new PatternLayout("%m%n");
@@ -58,22 +60,24 @@ public class Controller {
 		log.addAppender(consoleAppender);
 		log.addAppender(fileAppender);
 		
-		
-		System.out.println("Starting Client...");
-		client = true;
-		this.dburl = dburl;
-		this.dbusr =dbusr;
-		this.dbpwd = dbpwd;
-		conect = new ArrayList<TCPVerbindung>();
-		conect.add(new TCPVerbindung(this,server, port));
-		conect.get(0).openConection();
-		this.rechp = rechp;
-		this.checkPath();
-		this.dir = new Directory(rechp);
-		dir.setUp();
-		ui = new UserInterface(this);
-		ui.start();
-		System.out.println("Client started");
+		try {
+			System.out.println("Starting Client...");
+			client = true;
+			db = new DBConnector(dburl, dbusr, dbpwd);
+			conect = new ArrayList<TCPVerbindung>();
+			conect.add(new TCPVerbindung(this,server, port));
+			conect.get(0).openConection();
+			this.rechp = rechp;
+			this.checkPath();
+			this.dir = new Directory(rechp);
+			dir.setUp();
+			ui = new UserInterface(this);
+			ui.start();
+			System.out.println("Client started");
+		} catch (ClassNotFoundException | SQLException e) {
+			System.out.println("DB ERROR:\n"+  e.getMessage() + "\nClosing Program!");
+			System.exit(0);
+		} catch(Nothingtosync e){}
 	}
 	/**
 	 * Konstruktor
@@ -99,20 +103,23 @@ public class Controller {
 		log.addAppender(consoleAppender);
 		log.addAppender(fileAppender);
 		
-		System.out.println("Starting Server..");
-		client = false;
-		this.dburl = dburl;
-		this.dbusr =dbusr;
-		this.dbpwd = dbpwd;
-		conect = new ArrayList<TCPVerbindung>();
-		tcpreg = new TCPClientRegistration(this, port);
-		tot = new Totengraeber();
-		this.rechp = rechp;
-		this.checkPath();
-		dir=null;
-		ui = new UserInterface(this);
-		ui.start();
-		System.out.println("Server started!");
+		try{
+			System.out.println("Starting Server..");
+			client = false;
+			db = new DBConnector(dburl, dbusr, dbpwd);
+			conect = new ArrayList<TCPVerbindung>();
+			tcpreg = new TCPClientRegistration(this, port);
+			tot = new Totengraeber();
+			this.rechp = rechp;
+			this.checkPath();
+			dir=null;
+			ui = new UserInterface(this);
+			ui.start();
+			System.out.println("Server started!");
+	} catch (ClassNotFoundException | SQLException e) {
+		System.out.println("DB ERROR:\n"+  e.getMessage() + "\nClosing Program!");
+		System.exit(0);
+	}
 	}
 	/**
 	 * Überprueft den File Pfad
@@ -169,6 +176,7 @@ public class Controller {
 	public void shutdown(){
 		System.out.println("Shutting down...");
 		try {
+			if(db != null)db.close();
 			if(ui != null)ui.stop();
 			if(tcpreg != null)tcpreg.stop();
 			if(conect != null)
@@ -231,45 +239,40 @@ public class Controller {
 	 * @param args
 	 */
 	public static void main(String[] args){
+		boolean wronginput = true;
 		try{
-			boolean wronginput = false;
+			wronginput = false;
 			if(!(args.length >= 1)){
 				wronginput =true;
 			}else{
 				if(args[0].equalsIgnoreCase("dc")){
-					new Controller("", "", "","127.0.0.1", 4444, "Rechnungen","replication.log");
+					new Controller("jdbc:mysql://127.0.0.1/rep_db", "test", "test","127.0.0.1", 4444, "Rechnungen","replication.log");
 				}else if(args[0].equalsIgnoreCase("ds")){
-					new Controller("", "", "", 4444, "Rechnungen1","replication1.log");
+					new Controller("jdbc:mysql://127.0.0.1/rep_db1", "test", "test", 4444, "Rechnungen1","replication1.log");
 				}else if(args[0].equalsIgnoreCase("s")){
-					new Controller("", "", "", Integer.parseInt(args[1]), args[2],args[3]);
+					new Controller("jdbc:mysql://" + args[4] + "/" + args[5], args[6], args[7], Integer.parseInt(args[1]), args[2],args[3]);
 				}else if(args[0].equalsIgnoreCase("c")){
-					new Controller("", "", "", args[1],  Integer.parseInt(args[2]), args[3],args[4]);
+					new Controller("jdbc:mysql://" + args[5] + "/" + args[6], args[7], args[8], args[1],  Integer.parseInt(args[2]), args[3],args[4]);
 				}else
 					wronginput = true;
 			}
-			if(wronginput){
-				//TODO anpassen
-				System.out.println("Please enter one of the following options:");
-				System.out.println("The default options with 50 Tests(N) and 5000 ArraySize");
-				System.out.println("<d> Testing both algorithm");
-				System.out.println("<fd> Testing the fact algorithm");
-				System.out.println("<sd> Testing the sort algorithm");
-				System.out.println("The custom options with custom arraysizes");
-				System.out.println("<b> <N> <ArraySize> Testing both algorithm ");
-				System.out.println("<f> <N> <ArraySize> Testing the fact algorithm");
-				System.out.println("<s> <N> <ArraySize> Testing the sort algorithm");
-			}
+			
 		} catch(NumberFormatException e){
-			System.err.println("Bitte richtige Zahlen eingaben!");
+			wronginput = true;
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			wronginput = true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Nothingtosync e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			wronginput = true;
+		} catch (NullPointerException e){
+			wronginput = true;
+		}
+		if(wronginput){
+			System.out.println("Wrong Arguments!");
+			System.out.println("Please enter one of the following options:");
+			System.out.println("dc - Default Settings for Client");
+			System.out.println("ds - Default Settings for Server");
+			System.out.println("s <PORT> <FILEDIR> <LOGFILE> <DB-IP> <DB-NAME> <DB-USER> <DB-PASS>");
+			System.out.println("c <SERVER-IP> <PORT> <FILEDIR> <LOGFILE> <DB-IP> <DB-NAME> <DB-USER> <DB-PASS>");
 		}
 	}
 }

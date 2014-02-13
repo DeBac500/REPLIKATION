@@ -12,8 +12,7 @@ public class DBsyncer implements Syncable{
 
 	@Override
 	public void setUp(Controller c) throws Nothingtosync, IOException {
-		// TODO Auto-generated method stub
-		
+				
 	}
 
 	@Override
