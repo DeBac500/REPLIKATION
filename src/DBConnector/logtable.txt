@@ -1,6 +1,0 @@
-CREATE TABLE log_123(
-	action VARCHAR(255),
-	tabn VARCHAR(255),
-	row VARCHAR(255),
-	value VARCHAR(255),
-	times time)ENGINE=INNODB;

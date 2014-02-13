@@ -50,6 +50,8 @@ public class DBConnector {
 			rs = conn.createStatement().executeQuery(sql);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
+		} catch (NullPointerException e1){
+			System.err.println("Error with database! Is the database running right now?");
 		}
 		return rs;
 	}
