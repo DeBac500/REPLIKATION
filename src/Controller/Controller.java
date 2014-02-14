@@ -16,6 +16,7 @@ import org.apache.log4j.PatternLayout;
 import Conection.TCPClientRegistration;
 import Conection.TCPVerbindung;
 import DBHandler.DBConnector;
+import DBHandler.DBsyncer;
 import FileHandler.Directory;
 import FileHandler.FileSyncer;
 /**
@@ -208,6 +209,11 @@ public class Controller {
 		sync.setUp(this);
 		return sync;
 	}
+	public DBsyncer setUpDBSync() throws Nothingtosync, IOException{
+		DBsyncer sync = new DBsyncer();
+		sync.setUp(this);
+		return sync;
+	}
 	/**
 	 * Gibt Logger zurueck
 	 * @return
@@ -234,6 +240,8 @@ public class Controller {
 	 * @return
 	 */
 	public boolean getClient(){return this.client;}
+	
+	public DBConnector getDB(){return db;}
 	/**
 	 * Main
 	 * @param args

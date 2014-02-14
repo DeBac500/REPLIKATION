@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import Controller.Controller;
 import Controller.Nothingtosync;
 import Controller.Syncable;
+import DBHandler.DBsyncer;
 import FileHandler.Directory;
 import FileHandler.FileSyncer;
 /**
@@ -109,7 +110,8 @@ public class TCPVerbindung implements Runnable{
 		    				FileSyncer temp = this.c.setUpFileSync(dir);
 		    				this.sendObject(temp);
 	    				}else{
-	    					//TODO DB
+	    					DBsyncer temp =this.c.setUpDBSync();
+	    					this.sendObject(temp);
 	    				}
 	    			}
 	    		}
