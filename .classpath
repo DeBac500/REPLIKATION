@@ -2,8 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="D:/Datein/User/Dokumente/GitHub/REPLIKATION/lib/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="D:/Datein/User/Dokumente/GitHub/REPLIKATION/lib/mysql-connector-java-5.1.28-bin.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Alex/Documents/REPLIKATION/lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="D:/Other/MySQL/Connector J 5.1.29/mysql-connector-java-5.1.29-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
