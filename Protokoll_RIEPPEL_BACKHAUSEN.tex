@@ -68,7 +68,7 @@ Als Konsistenzmodell wird das Monotone Schreiben gewählt, da es nach unserer An
 		Dominik Backhausen & Verbindung der Clients & 1h & 1h\\\tabucline[1pt]{-}
 		Dominik Backhausen & Replikationsmanager & 4h & 5h\\\tabucline[1pt]{-}
 		Dominik Backhausen & Datenbankverbindung & 1h & 1h\\\tabucline[1pt]{-}
-		Gesamt && 10h & 9h\\\tabucline[2pt]{-}
+		Gesamt && 12h & 13h\\\tabucline[2pt]{-}
 	\end{tabu}	
 \chapter{Arbeitsdurchführung}
 Die tatsächliche Implementierung der Synchronisation von normalen Files ist nach oben beschriebener Designüberlegung erfolgt. Der Austausch der Files funktioniert problemlos. 
@@ -83,6 +83,15 @@ Zum Start des Programms gibt es folgende Möglichkeiten:
 \item c <SERVER-IP> <PORT> <FILEDIR> <LOGFILE> <DB-IP> <DB-NAME> <DB-USER> <DB-PASS> (Starten des Clients mit angegebenen Argumenten)
 \end{itemize}
 Die Argumente für die Datenbank sind die gleichen, da es sich um ein einziges Programm handelt, dass beides managed. 
+\section{Fragen}
+\begin{itemize}
+\item Wie oft wird repliziert?
+\subitem Es existieren beliebig viele Clients und ein Server, demnach wird sooft repliziert wie Nodes vorhanden sind.
+\item Wie erfolgt der Aufruf des Replikationsmanager bzw. läuft der Replikationsmanager stets im Hintergrund?
+\subitem Der Aufruf erfolgt per Commandline und Argumenten, wobei der Rep-Manager stets im Hintergrund läuft.
+\item Was passiert im Fehlerfall?
+\subitem Im Fehlerfall wird das File bzw. der Datenbankeintrag schlicht nicht gesendet. Da das Programm allerdings über Problemlösungsleitfäden verfügt, ist die Wahrscheinlichkeit, dass ein Fehler auftritt, eher gering. 
+\end{itemize}
 \section{Fehlerszenarien}
 \begin{itemize}
 \item Dateien mit gleichen Namen
