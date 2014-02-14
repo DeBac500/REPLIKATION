@@ -1,6 +1,7 @@
 package DBHandler;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 
 public class DBSaver implements Serializable {
 	public String type, tabname, colname, valNEW, valOLD;
@@ -23,8 +24,16 @@ public class DBSaver implements Serializable {
 		return true;	
 	}
 	public boolean wirte(DBConnector db){
-		String sql = this.generateSQL();
-		return false;
+		try{
+			String sql = this.generateSQL();
+			int ch = db.executeUpdate(sql);
+			if(ch >= 1){
+				return true;
+			}else
+				return false;
+		}catch(SQLException e){
+			return false;
+		}
 	}
 	private String generateSQL(){
 		String sql = "";
@@ -74,5 +83,12 @@ public class DBSaver implements Serializable {
 			}
 		}
 		return sql;
+	}
+
+	public String getType() {
+		return type;
+	}
+	public String getTabname() {
+		return tabname;
 	}
 }

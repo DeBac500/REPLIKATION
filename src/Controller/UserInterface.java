@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import DBHandler.DBsyncer;
 import FileHandler.FileSyncer;
 /**
  * UserInterface fuer Usereingaben
@@ -56,6 +57,8 @@ public class UserInterface implements Runnable{
 			try {
 				FileSyncer s = this.controller.setUpFileSync();
 				this.controller.send(s);
+				DBsyncer sync = this.controller.setUpDBSync();
+				this.controller.send(sync);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
