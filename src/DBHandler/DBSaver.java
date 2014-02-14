@@ -3,6 +3,10 @@ package DBHandler;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+
+import Controller.Nothingtosync;
+
 public class DBSaver implements Serializable {
 	public String type, tabname, colname, valNEW, valOLD;
 	
@@ -23,7 +27,7 @@ public class DBSaver implements Serializable {
 		this.valOLD = valOLD;
 		return true;	
 	}
-	public boolean wirte(DBConnector db){
+	public boolean wirte(DBConnector db) throws Nothingtosync{
 		try{
 			String sql = this.generateSQL();
 			int ch = db.executeUpdate(sql);
@@ -33,8 +37,9 @@ public class DBSaver implements Serializable {
 				return false;
 		}catch(SQLException e){
 			//TODO
-			e.printStackTrace();
-			return false;
+			//e.printStackTrace();
+			//return false;
+			throw new Nothingtosync();
 		}
 	}
 	private String generateSQL(){

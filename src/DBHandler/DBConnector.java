@@ -45,8 +45,8 @@ public class DBConnector {
 	}
 	public void dellog(DBSaver d){
 		try{
-			String sql = "DELETE FROM log_123 WHERE tab=" +d.getTabname() + " AND act=" +d.getType() + " AND valNEW=" + d.getValNEW();
-			conn.createStatement().execute(sql);
+			String sql = "DELETE FROM log_123 WHERE tab=" +d.getTabname() + " AND act=" +d.getType();
+			conn.createStatement().executeUpdate(sql);
 		}catch(SQLException e){}
 	}
 	public ArrayList<String> showTables() {

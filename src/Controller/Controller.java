@@ -249,18 +249,22 @@ public class Controller {
 	public static void main(String[] args){
 		boolean wronginput = true;
 		try{
-			wronginput = false;
+			wronginput = true;
 			if(!(args.length >= 1)){
 				wronginput =true;
 			}else{
 				if(args[0].equalsIgnoreCase("dc")){
 					new Controller("jdbc:mysql://127.0.0.1/rep_db", "test", "test","127.0.0.1", 4444, "Rechnungen","replication.log");
+					wronginput = false;
 				}else if(args[0].equalsIgnoreCase("ds")){
 					new Controller("jdbc:mysql://127.0.0.1/rep_db1", "test", "test", 4444, "Rechnungen1","replication1.log");
+					wronginput = false;
 				}else if(args[0].equalsIgnoreCase("s")){
 					new Controller("jdbc:mysql://" + args[4] + "/" + args[5], args[6], args[7], Integer.parseInt(args[1]), args[2],args[3]);
+					wronginput = false;
 				}else if(args[0].equalsIgnoreCase("c")){
 					new Controller("jdbc:mysql://" + args[5] + "/" + args[6], args[7], args[8], args[1],  Integer.parseInt(args[2]), args[3],args[4]);
+					wronginput = false;
 				}else
 					wronginput = true;
 			}
