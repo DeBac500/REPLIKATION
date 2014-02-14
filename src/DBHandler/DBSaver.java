@@ -32,6 +32,8 @@ public class DBSaver implements Serializable {
 			}else
 				return false;
 		}catch(SQLException e){
+			//TODO
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -90,5 +92,13 @@ public class DBSaver implements Serializable {
 	}
 	public String getTabname() {
 		return tabname;
+	}
+
+	public String getValNEW() {
+		return valNEW;
+	}
+
+	public String getValOLD() {
+		return valOLD;
 	}
 }

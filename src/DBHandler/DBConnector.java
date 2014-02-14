@@ -29,11 +29,10 @@ public class DBConnector {
 	}
 	
 	public void setUP() throws SQLException{
-		Statement s = conn.createStatement();
 		String sql = "drop table if exists log_123";
-		s.executeQuery(sql);
+		conn.createStatement().execute(sql);
 		sql="CREATE TABLE log_123(act VARCHAR(255),tab VARCHAR(255),col VARCHAR(255),valNEW TEXT,valOLD TEXT,tim timestamp,PRIMARY KEY (tim))ENGINE=INNODB";
-		s.executeQuery(sql);
+		conn.createStatement().execute(sql);
 		
 		ArrayList<String> tabn = showTables();
 		for(int i = 0; i < tabn.size();i++){
@@ -44,14 +43,18 @@ public class DBConnector {
 			}
 		}
 	}
+	public void dellog(DBSaver d){
+		try{
+			String sql = "DELETE FROM log_123 WHERE tab=" +d.getTabname() + " AND act=" +d.getType() + " AND valNEW=" + d.getValNEW();
+			conn.createStatement().execute(sql);
+		}catch(SQLException e){}
+	}
 	public ArrayList<String> showTables() {
 		String sql = "show tables";
 		ResultSet rs = null;
 		ArrayList<String> dat=new ArrayList<String>();
 		try {
-			Statement s =conn.createStatement();
-			rs = s.executeQuery(sql);
-			s.close();
+			rs = conn.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				dat.add(rs.getString(1));
 			}
@@ -64,9 +67,7 @@ public class DBConnector {
 	}
 	
 	public int executeUpdate(String sql) throws SQLException {
-		Statement s =conn.createStatement();
-		int re = s.executeUpdate(sql);
-		s.close();
+		int re = conn.createStatement().executeUpdate(sql);
 		return re;
 	}
 	
@@ -75,18 +76,18 @@ public class DBConnector {
 		ResultSet rs = null;
 		ArrayList<String> col=new ArrayList<String>();
 		try {
-			Statement s =conn.createStatement();
 			sql="show columns from "+tab;
-			rs = s.executeQuery(sql);
+			rs = conn.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				col.add(rs.getString(1));
 			}
-			s.executeQuery("DROP TRIGGER IF EXISTS logUPD_"+tab);
+			conn.createStatement().execute("DROP TRIGGER IF EXISTS logUPD_"+tab);
+			//conn.createStatement().execute("DELIMITER | ");
 			sql = ""
-					+ "DELIMITER |"
+					+ ""
 					+ "CREATE TRIGGER logUPD_"+tab+" AFTER UPDATE ON "+tab+" FOR EACH ROW "
 					+ "BEGIN "
-					+ "INSERT INTO log_123 (act,tab,col,valNEW,valOLD,tim)"
+					+ "INSERT INTO log_123 (act,tab,col,valNEW,valOLD,tim) "
 					+ "VALUES('UPDATE','"+tab+"','";
 			for(int i=0;i<col.size();i++){
 				if(i != col.size()-1){
@@ -98,25 +99,25 @@ public class DBConnector {
 			sql += "',CONCAT(";
 			for(int i=0;i<col.size();i++){
 				if(i != col.size()-1){
-					sql += "'\'', NEW." + col.get(i) + ", '\','";
+					sql += "'\"',NEW." + col.get(i) + " , '\"' , ',' ,";
 				}else{
-					sql += "'\'', NEW." + col.get(i) + ", '\''";
+					sql += "'\"',NEW." + col.get(i) + ",'\"' ";
 				}			
 			}
 			sql += "),CONCAT(";
 			for(int i=0;i<col.size();i++){
 				if(i != col.size()-1){
-					sql += "'\'', OLD." + col.get(i) + ", '\','";
+					sql += "'\"',OLD." + col.get(i) + " , '\"' , ',' ,";
 				}else{
-					sql += "'\'', OLD." + col.get(i) + ", '\''";
+					sql += "'\"',OLD." + col.get(i) + ",'\"' ";
 				}			
 			}
 			sql +="),NOW());"
-					+ "END"
-					+ "|"
-					+ "DELIMITER ;";
-			s.executeQuery(sql);
-			s.close();
+					+ " END "
+					+ ""
+					+ "";
+			conn.createStatement().execute(sql);
+			//conn.createStatement().execute("DELIMITER ; ");
 		} catch (SQLException e) {
 			System.err.println("Error with creating the UPDATE Triggers: "+e.getMessage());
 		} catch (NullPointerException e1){
@@ -130,18 +131,18 @@ public class DBConnector {
 		ResultSet rs = null;
 		ArrayList<String> col=new ArrayList<String>();
 		try {
-			Statement s =conn.createStatement();
 			sql="show columns from "+tab;
-			rs = s.executeQuery(sql);
+			rs = conn.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				col.add(rs.getString(1));
 			}
-			s.executeQuery("DROP TRIGGER IF EXISTS logINS_"+tab);
+			conn.createStatement().execute("DROP TRIGGER IF EXISTS logINS_"+tab);
+			//conn.createStatement().execute("DELIMITER | ");
 			sql = ""
-					+ "DELIMITER |"
+					+ ""
 					+ "CREATE TRIGGER logINS_"+tab+" AFTER INSERT ON "+tab+" FOR EACH ROW "
 					+ "BEGIN "
-					+ "INSERT INTO log_123 (act,tab,col,valNEW,valOLD,tim)"
+					+ "INSERT INTO log_123 (act,tab,col,valNEW,valOLD,tim) "
 					+ "VALUES('INSERT','"+tab+"','";
 			for(int i=0;i<col.size();i++){
 				if(i != col.size()-1){
@@ -153,18 +154,18 @@ public class DBConnector {
 			sql += "',CONCAT(";
 			for(int i=0;i<col.size();i++){
 				if(i != col.size()-1){
-					sql += "'\'', NEW." + col.get(i) + ", '\','";
+					sql += "'\"',NEW." + col.get(i) + " , '\"' , ',' ,";
 				}else{
-					sql += "'\'', NEW." + col.get(i) + ", '\''";
+					sql += "'\"',NEW." + col.get(i) + ",'\"' ";
 				}			
 			}
-			sql += "),NULL";
+			sql += "),NULL ";
 			sql +=",NOW());"
-					+ "END"
-					+ "|"
-					+ "DELIMITER ;";
-			s.executeQuery(sql);
-			s.close();
+					+ " END "
+					+ ""
+					+ "";
+			conn.createStatement().execute(sql);
+			//conn.createStatement().execute("DELIMITER ; ");
 		} catch (SQLException e) {
 			System.err.println("Error with creating the INSERT Triggers: "+e.getMessage());
 		} catch (NullPointerException e1){
@@ -178,18 +179,18 @@ public class DBConnector {
 		ResultSet rs = null;
 		ArrayList<String> col=new ArrayList<String>();
 		try {
-			Statement s =conn.createStatement();
 			sql="show columns from "+tab;
-			rs = s.executeQuery(sql);
+			rs = conn.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				col.add(rs.getString(1));
 			}
-			s.executeQuery("DROP TRIGGER IF EXISTS logDEL_"+tab);
+			conn.createStatement().execute("DROP TRIGGER IF EXISTS logDEL_"+tab);
+			//conn.createStatement().execute("DELIMITER | ");
 			sql = ""
-					+ "DELIMITER |"
+					+ ""
 					+ "CREATE TRIGGER logDEL_"+tab+" BEFORE DELETE ON "+tab+" FOR EACH ROW "
 					+ "BEGIN "
-					+ "INSERT INTO log_123 (act,tab,col,valNEW,valOLD,tim)"
+					+ "INSERT INTO log_123 (act,tab,col,valNEW,valOLD,tim) "
 					+ "VALUES('DELETE','"+tab+"','";
 			for(int i=0;i<col.size();i++){
 				if(i != col.size()-1){
@@ -201,18 +202,18 @@ public class DBConnector {
 			sql += "',NULL,CONCAT(";
 			for(int i=0;i<col.size();i++){
 				if(i != col.size()-1){
-					sql += "'\'', OLD." + col.get(i) + ", '\','";
+					sql += "'\"',OLD." + col.get(i) + " , '\"' , ',' ,";
 				}else{
-					sql += "'\'', OLD." + col.get(i) + ", '\''";
+					sql += "'\"',OLD." + col.get(i) + ",'\"' ";
 				}			
 			}
 			sql += ")";
 			sql +=",NOW());"
-					+ "END"
-					+ "|"
-					+ "DELIMITER ;";
-			s.executeQuery(sql);
-			s.close();
+					+ " END "
+					+ ""
+					+ "";
+			conn.createStatement().execute(sql);
+			//conn.createStatement().execute("DELIMITER ; ");
 		} catch (SQLException e) {
 			System.err.println("Error with creating the DELETE Triggers: "+e.getMessage());
 		} catch (NullPointerException e1){
@@ -224,13 +225,11 @@ public class DBConnector {
 		ResultSet rs = null;
 		ArrayList<DBSaver> dat=new ArrayList<DBSaver>();
 		try {
-			Statement s= conn.createStatement();
-			rs = s.executeQuery(sql);
+			rs = conn.createStatement().executeQuery(sql);
 			while (rs.next()) {
 				dat.add(new DBSaver(rs.getString("act"), rs.getString("tab"), rs.getString("col"), rs.getString("valNEW"), rs.getString("valOLD")));
 			}
-			s.executeUpdate("DELETE FROM log_123");
-			s.close();
+			conn.createStatement().executeUpdate("DELETE FROM log_123");
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		} catch (NullPointerException e1){

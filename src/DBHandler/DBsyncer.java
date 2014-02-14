@@ -23,6 +23,7 @@ public class DBsyncer implements Syncable{
 		for(int i=0; i < save.size(); i++){
 			if(save.get(i).wirte(c.getDB())){
 				try {
+					c.getDB().dellog(save.get(i));
 					String send = save.get(i).getTabname() + " " + save.get(i).getType() + " " + tcp.getAddressEnd() +" -> " + tcp.getAddress() + " OKAY";
 					tcp.sendObject(send);
 					c.getLog().info(send);
@@ -31,6 +32,7 @@ public class DBsyncer implements Syncable{
 				}
 			}else{
 				try{
+					c.getDB().dellog(save.get(i));
 					String send = save.get(i).getTabname() + " " + save.get(i).getType() + " " + tcp.getAddressEnd() +" -> " + tcp.getAddress() + " FEHLGESCHLAGEN";
 					tcp.sendObject(send);
 					c.getLog().info(send);
