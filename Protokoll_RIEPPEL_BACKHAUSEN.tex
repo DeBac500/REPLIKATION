@@ -51,7 +51,9 @@
 	\end{itemize}
 \chapter{Designüberlegung}
 \section{Allgemein}
-Es soll einen oder mehrere Clients geben die sich zuerst mit dem Server verbinden müssen um die aktuellen Daten zu erhalten. Als nächstes können die Clients sich mit dem Server synchronisieren, wobei das Verfahren im Kapitel Konsistenzmodell näher erläutert ist. Wenn ein Client ein File in seinem Dateisystem aktualisiert, kann er dieses File synchronisieren. Es wird danach ein Abgleich der Änderungsdaten gemacht und die entsprechenden Files aktualisiert. Bei der Datenbank soll dies ähnlich funktionieren.
+Es soll einen oder mehrere Clients geben die sich zuerst mit dem Server verbinden müssen um die aktuellen Daten zu erhalten. Als nächstes können die Clients sich mit dem Server synchronisieren, wobei das Verfahren im Kapitel Konsistenzmodell näher erläutert ist. Wenn ein Client ein File in seinem Dateisystem aktualisiert, kann er dieses File synchronisieren. Es wird danach ein Abgleich der Änderungsdaten gemacht und die entsprechenden Files aktualisiert.
+
+Bei der Datenbank ist die Umsetzung so geplant, dass sämtliche Befehle die an der Datenbank getätigt werden zunächst mitgeloggt werden und dann alle notwendigen Befehle an die anderen Hosts gesendet werden. 
 \section{Konsistenzmodell}
 Als Konsistenzmodell wird das Monotone Schreiben gewählt, da es nach unserer Ansicht für diese Aufgabenstellung sinnvoll ist, erst alle Schreibvorgänge des Servers beim Client auszuführen bevor dieser Client wieder etwas zum Server hochladen kann.
 \chapter{Arbeitsaufteilung}
@@ -60,14 +62,18 @@ Als Konsistenzmodell wird das Monotone Schreiben gewählt, da es nach unserer An
 		\tabucline[2pt]{-}
 		Name & Arbeitssegment & Time Estimated & Time Spent\\\tabucline[2pt]{-}
 		
-		Alexander Rieppel & Datenbankverbindung & 1h & 2h\\\tabucline[1pt]{-}
-		Alexander Rieppel & Replikationsmanager & 4h & 3h\\\tabucline[1pt]{-}
-		Dominik Backhausen & Verbindung der Clients & 1h & 0.5h\\\tabucline[2pt]{-}
-		Dominik Backhausen & Replikationsmanager & 4h & 3.5h\\\tabucline[2pt]{-}
+		Alexander Rieppel & Datenbankverbindung & 1h & 3h\\\tabucline[1pt]{-}
+		Alexander Rieppel & Replikationsmanager & 4h & 2h\\\tabucline[1pt]{-}
+		Alexander Rieppel & Trigger für Datenbank & 1h & 1h\\\tabucline[1pt]{-}
+		Dominik Backhausen & Verbindung der Clients & 1h & 1h\\\tabucline[1pt]{-}
+		Dominik Backhausen & Replikationsmanager & 4h & 5h\\\tabucline[1pt]{-}
+		Dominik Backhausen & Datenbankverbindung & 1h & 1h\\\tabucline[1pt]{-}
 		Gesamt && 10h & 9h\\\tabucline[2pt]{-}
 	\end{tabu}	
 \chapter{Arbeitsdurchführung}
-Die tatsächliche Implementierung ist nach oben beschriebener Designüberlegung erfolgt mit der Ausnahme, dass die Synchronisation der Datenbank noch nicht funktioniert. Der Austausch der Files funktioniert problemlos. Das einzige Problem ist,dass der Erstkontakt noch nicht reibungslos funktioniert, da die Files nicht heruntergeladen werden vom Server.
+Die tatsächliche Implementierung der Synchronisation von normalen Files ist nach oben beschriebener Designüberlegung erfolgt. Der Austausch der Files funktioniert problemlos. 
+
+Die Datenbank wurde ebenfalls so, wie in der Designüberlegung angeführt, umgesetzt. Um dies zu realisieren gibt es eine eigene Tabelle welche für das mitloggen aller Aktivitäten zuständig ist. Dabei ist zu beachten, dass alle INSERTS, UPDATES, und DELETES von auf der Datenbank vorinstallierten TRIGGERN, in die Logtabelle geschrieben werden. Aller TRIGGER werden vom Programm für die entsprechenden Tabellen generiert und beim Programmstart in die Datenbank automatisch eingetragen. Anschließend werden  nach dem loggen die an der Datenbank durchgeführten Aktivitäten ausgelesen und alle benötigten Befehle an den Server und damit an die anderen Hosts gesendet.  
 \chapter{Testbericht}
 Zum Start des Programms gibt es folgende Möglichkeiten:
 \begin{itemize}
@@ -76,7 +82,7 @@ Zum Start des Programms gibt es folgende Möglichkeiten:
 \item s <port> <pfad> (Starten des Servers mit angegebenen Argumenten)
 \item c <ip> <port> <pfad> (Starten des Clients mit angegebenen Argumenten)
 \end{itemize}
-Die Argumente für die Verbindung der Datenbank sind noch nicht vorhanden, da die Datenbankreplikation bislang nicht implementiert ist. Derzeit wird auch noch nicht automatisch synchronisiert, was ebenfalls in Planung war.
+Die Argumente für die Datenbank sind die gleichen, da es sich um ein einziges Programm handelt, dass beides managed. 
 \section{Fehlerszenarien}
 \begin{itemize}
 \item Dateien mit gleichen Namen
@@ -84,7 +90,7 @@ Die Argumente für die Verbindung der Datenbank sind noch nicht vorhanden, da di
 \item Dateien mit gleichen Namen und unterschiedlicher Größe
 \subitem Siehe Punkt 1
 \item Datensatz mit gleichem Schlüssel
-\subitem Derzeit keine Datenbank Implementierung, allerdings darf immer nur ein eindeutiger Schlüssel vorhanden sein, demnach wird der ältere ebenfalls überschrieben. 
+\subitem Bei Insert ist die Synchronisation fehlgeschlagen, da es, wenn er die aktuelle Datenbank besitzt, erst gar nicht in die Datenbank eingetragen wird. Sollte er eine alte Version der Datenbank haben (was hoffentlich nicht der Fall sein sollte), passiert das gleiche, mit der Ausnahme, dass der Synchprozess erst beim Austausch der Daten mit dem Server fehlschlägt.
 \end{itemize}
  
  
